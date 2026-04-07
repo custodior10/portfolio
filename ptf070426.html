@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rafael Custódio · FP&amp;A · Analytics · Finance Systems</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=JetBrains+Mono:wght@300;400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ══════════════════════════════════════════
+       ROOT & RESET
+    ══════════════════════════════════════════ */
+    :root {
+      --bg-dark:      #050505;
+      --bg-surface:   #0d0d0d;
+      --bg-card:      #111111;
+      --accent:       #00BFFF;
+      --accent-dim:   rgba(0, 191, 255, 0.08);
+      --accent-mid:   rgba(0, 191, 255, 0.18);
+      --accent-border:rgba(0, 191, 255, 0.30);
+      --text-main:    #ffffff;
+      --text-muted:   #606060;
+      --text-soft:    #999999;
+      --border:       rgba(255, 255, 255, 0.07);
+      --border-strong:rgba(255, 255, 255, 0.12);
+      --font-display: 'Syne', sans-serif;
+      --font-body:    'Inter', sans-serif;
+      --font-code:    'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Grain overlay on hero */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.025;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ══════════════════════════════════════════
+       NAV
+    ══════════════════════════════════════════ */
+    nav {
+      position: fixed;
+      top: 0; width: 100%;
+      padding: 18px 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(5, 5, 5, 0.88);
+      backdrop-filter: blur(16px) saturate(1.2);
+      z-index: 1000;
+      border-bottom: 1px solid var(--border);
+      transition: padding 0.3s;
+    }
+    nav.scrolled { padding: 14px 50px; border-bottom-color: var(--border-strong); }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    .logo span { color: var(--accent); }
+
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-family: var(--font-code);
+      transition: color 0.2s;
+      position: relative;
+      padding-bottom: 4px;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 1px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--text-main); }
+    .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+      padding: 6px;
+      background: none;
+      border: none;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px; height: 1.5px;
+      background: var(--text-main);
+      transition: transform 0.3s ease, opacity 0.2s ease;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* Mobile menu overlay */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 5, 5, 0.97);
+      z-index: 999;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 0 32px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 10vw, 3rem);
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      letter-spacing: 1px;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--border);
+      width: 100%;
+      transition: color 0.2s;
+    }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu a:hover { color: var(--accent); }
+
+    /* ══════════════════════════════════════════
+       HERO
+    ══════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 50px 80px;
+      position: relative;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    /* Ambient glow orbs */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 10%; right: -8%;
+      width: 680px; height: 680px;
+      background: radial-gradient(circle, rgba(0,191,255,0.055) 0%, transparent 68%);
+      pointer-events: none;
+      animation: orb-drift 12s ease-in-out infinite alternate;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -10%; left: -5%;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(0,191,255,0.03) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    @keyframes orb-drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(-30px, 30px) scale(1.08); }
+    }
+
+    .terminal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid var(--accent-border);
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      margin-bottom: 28px;
+      letter-spacing: 1px;
+    }
+    .terminal-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      animation: blink 1.2s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(3.2rem, 8vw, 6.8rem);
+      font-weight: 800;
+      line-height: 1.0;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      letter-spacing: -2px;
+    }
+    .hero h1 .accent { color: var(--accent); }
+
+    .hero-sub {
+      font-family: var(--font-code);
+      font-weight: 300;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      max-width: 540px;
+      line-height: 1.9;
+      min-height: 2.4em;
+    }
+    .cursor-char {
+      display: inline-block;
+      width: 2px; height: 1.1em;
+      background: var(--accent);
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+      margin-left: 2px;
+    }
+
+    .hero-meta {
+      margin-top: 64px;
+      display: flex;
+      gap: 64px;
+      padding-top: 40px;
+      border-top: 1px solid var(--border);
+    }
+    .hero-stat-num {
+      font-family: var(--font-display);
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .hero-stat-label {
+      font-family: var(--font-code);
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-top: 6px;
+    }
+
+    /* ══════════════════════════════════════════
+       SECTION BASE
+    ══════════════════════════════════════════ */
+    section { padding: 100px 50px; }
+
+    .section-eyebrow {
+      font-family: var(--font-code);
+      font-size: 0.68rem;
+      color: var(--accent);
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3rem);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .section-title .muted { color: var(--text-muted); font-weight: 600; }
+    .section-desc {
+      font-family: var(--font-code);
+      font-weight: 300;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 56px;
+      max-width: 520px;
+      line-height: 1.9;
+    }
+
+    /* ══════════════════════════════════════════
+       OPERAÇÕES — CARDS
+    ══════════════════════════════════════════ */
+    #operacoes { background: var(--bg-surface); }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 16px;
+    }
+
+    .op-card {
+      background: var(--bg-card);
+      padding: 42px 36px;
+      position: relative;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: transform 0.35s cubic-bezier(0.22,1,0.36,1),
+                  border-color 0.3s ease,
+                  background 0.2s;
+    }
+    /* Dynamic cursor glow (set via JS) */
+    .op-card::before {
+      content: '';
+      position: absolute;
+      top: var(--mouse-y, -200px);
+      left: var(--mouse-x, -200px);
+      transform: translate(-50%, -50%);
+      width: 360px; height: 360px;
+      background: radial-gradient(circle, rgba(0,76,255,0.14) 0%, transparent 55%);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* Top accent bar */
+    .op-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
+      z-index: 1;
+    }
+    .op-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--accent-border);
+    }
+    .op-card:hover::before { opacity: 1; }
+    .op-card:hover::after  { transform: scaleX(1); }
+    .op-card:hover .op-tag { color: var(--accent); border-color: var(--accent-border); }
+
+    .op-card-content { position: relative; z-index: 1; }
+
+    .op-card-index {
+      font-family: var(--font-code);
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      margin-bottom: 24px;
+    }
+    .op-card-client {
+      display: inline-block;
+      font-family: var(--font-code);
+      font-size: 0.62rem;
+      color: var(--accent);
+      border: 1px solid var(--accent-border);
+      background: var(--accent-dim);
+      padding: 3px 10px;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+    .op-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      letter-spacing: 0.3px;
+    }
+    .op-card > .op-card-content > p {
+      color: var(--text-muted);
+      font-size: 0.86rem;
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+    .op-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+    .op-tag {
+      font-family: var(--font-code);
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 3px 9px;
+      letter-spacing: 0.5px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    /* ══════════════════════════════════════════
+       COMPETÊNCIAS
+    ══════════════════════════════════════════ */
+    #competencias { background: var(--bg-dark); }
+
+    .skills-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .skills-col { background: var(--bg-card); padding: 40px 36px; }
+    .skills-col-title {
+      font-family: var(--font-code);
+      font-size: 0.62rem;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .skill-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .skill-row:last-child { border-bottom: none; }
+    .skill-bar-wrap { flex: 1; }
+    .skill-name { font-size: 0.86rem; color: var(--text-main); margin-bottom: 7px; }
+    .skill-track {
+      height: 2px;
+      background: var(--border);
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    .skill-fill {
+      position: absolute;
+      top: 0; left: 0; height: 100%;
+      background: linear-gradient(90deg, var(--accent), #58d6ff);
+      width: 0;
+      transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .skill-fill.animate { width: var(--w); }
+    .skill-badge {
+      font-family: var(--font-code);
+      font-size: 0.58rem;
+      color: var(--accent);
+      letter-spacing: 1px;
+      white-space: nowrap;
+      opacity: 0.65;
+    }
+
+    /* ══════════════════════════════════════════
+       FORMAÇÃO
+    ══════════════════════════════════════════ */
+    #formacao { background: var(--bg-surface); }
+
+    .edu-block {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      max-width: 960px;
+    }
+    .edu-left {
+      background: var(--bg-card);
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .edu-degree {
+      font-family: var(--font-display);
+      font-size: 1.9rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+    .edu-inst {
+      font-family: var(--font-code);
+      font-size: 0.68rem;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 16px;
+    }
+    .edu-right {
+      background: var(--bg-card);
+      padding: 48px 40px;
+      border-left: 1px solid var(--border);
+    }
+    .edu-right p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      line-height: 1.9;
+      margin-bottom: 24px;
+    }
+    .edu-status-label {
+      font-family: var(--font-code);
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .edu-status-val {
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      color: var(--accent);
+    }
+    .edu-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .edu-tag {
+      font-family: var(--font-code);
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+    }
+
+    /* ══════════════════════════════════════════
+       CONTATO
+    ══════════════════════════════════════════ */
+    #contato { background: var(--bg-dark); border-top: 1px solid var(--border); }
+
+    .contact-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .contact-cta {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4.5vw, 3.6rem);
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: 1.0;
+      margin-bottom: 24px;
+      letter-spacing: -0.5px;
+    }
+    .contact-cta span { color: var(--accent); }
+    .contact-intro {
+      font-family: var(--font-code);
+      font-weight: 300;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.9;
+    }
+    .contact-links { display: flex; flex-direction: column; }
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 22px 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      transition: border-color 0.25s;
+      overflow: hidden;
+    }
+    .contact-link:first-child { border-top: 1px solid var(--border); }
+    .contact-link:hover { border-color: var(--accent-border); }
+    .contact-link:hover .c-label { color: var(--accent); }
+    .contact-link:hover .c-value { color: var(--text-main); }
+    .contact-link:hover .c-arrow { opacity: 1; color: var(--accent); }
+    .c-label {
+      font-family: var(--font-code);
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      width: 80px;
+      flex-shrink: 0;
+      transition: color 0.2s;
+    }
+    .c-value {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      transition: color 0.2s;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .c-arrow {
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      opacity: 0;
+      flex-shrink: 0;
+      transition: opacity 0.2s;
+    }
+
+    /* ══════════════════════════════════════════
+       FORM (n8n webhook)
+    ══════════════════════════════════════════ */
+    .contact-right { display: flex; flex-direction: column; gap: 22px; }
+    .contact-form {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 26px 24px;
+    }
+    .form-title {
+      font-family: var(--font-code);
+      font-size: 0.62rem;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      opacity: 0.9;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .form-grid .full { grid-column: 1 / -1; }
+    .f-label {
+      display: block;
+      font-family: var(--font-code);
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .f-input, .f-textarea {
+      width: 100%;
+      background: #0b0b0b;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 12px 12px;
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .f-textarea { min-height: 120px; resize: vertical; line-height: 1.6; }
+    .f-input:focus, .f-textarea:focus { border-color: var(--accent-border); background: #0a0a0a; }
+    .form-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; align-items: center; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border: 1px solid var(--accent-border);
+      background: var(--accent-dim);
+      color: var(--text-main);
+      font-family: var(--font-code);
+      font-size: 0.68rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, background 0.2s;
+      text-decoration: none;
+      user-select: none;
+    }
+    .btn:hover { transform: translateY(-1px); border-color: var(--accent); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn.ghost {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text-muted);
+    }
+    .btn.ghost:hover { border-color: var(--border-strong); color: var(--text-main); }
+    .form-note {
+      font-family: var(--font-code);
+      font-size: 0.66rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+    .form-status {
+      font-family: var(--font-code);
+      font-size: 0.66rem;
+      color: var(--text-muted);
+      margin-top: 10px;
+      min-height: 1.6em;
+    }
+    .form-status.ok { color: #00c875; }
+    .form-status.err { color: #e24b4b; }
+
+    /* Floating WhatsApp button */
+    .wa-float {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 1200;
+      border-radius: 999px;
+      padding: 12px 14px;
+      background: rgba(0, 200, 117, 0.12);
+      border: 1px solid rgba(0, 200, 117, 0.35);
+      color: #bfffe7;
+      text-decoration: none;
+      font-family: var(--font-code);
+      font-size: 0.68rem;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      backdrop-filter: blur(10px) saturate(1.2);
+      transition: transform 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .wa-float:hover { transform: translateY(-1px); border-color: rgba(0, 200, 117, 0.6); background: rgba(0, 200, 117, 0.16); }
+    .wa-dot { width: 7px; height: 7px; border-radius: 50%; background: #00c875; }
+
+    /* ══════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════ */
+    footer {
+      padding: 24px 50px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-dark);
+    }
+    footer span {
+      font-family: var(--font-code);
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .footer-dot {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0.5;
+    }
+
+    /* ══════════════════════════════════════════
+       FADE-IN ANIMATIONS
+    ══════════════════════════════════════════ */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.75s ease, transform 0.75s cubic-bezier(0.22,1,0.36,1);
+    }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* ══════════════════════════════════════════
+       MOBILE
+    ══════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      nav.scrolled { padding: 12px 20px; }
+      .nav-links { display: none; }
+      .hamburger  { display: flex; }
+
+      section { padding: 64px 20px; }
+
+      .hero { min-height: 100svh; padding: 90px 20px 48px; justify-content: flex-end; }
+      .terminal-badge { font-size: 0.6rem; padding: 5px 10px; margin-bottom: 20px; white-space: normal; line-height: 1.6; }
+      .hero h1 { font-size: clamp(2.6rem, 12vw, 3.8rem); margin-bottom: 18px; letter-spacing: -0.5px; }
+      .hero-sub { font-size: 0.76rem; min-height: 3.6em; }
+      .hero-meta { margin-top: 36px; padding-top: 24px; display: grid; grid-template-columns: repeat(3,1fr); gap: 0; }
+      .hero-stat-num { font-size: 1.9rem; }
+      .hero-stat-label { font-size: 0.5rem; letter-spacing: 0.5px; }
+
+      .section-title { font-size: clamp(1.7rem, 7vw, 2.2rem); }
+      .section-desc  { font-size: 0.75rem; margin-bottom: 32px; }
+
+      .grid-3 { grid-template-columns: 1fr; gap: 12px; }
+      .op-card { padding: 28px 22px; }
+
+      .skills-wrapper { grid-template-columns: 1fr; }
+      .skills-col { padding: 28px 20px; }
+      .skills-col + .skills-col { border-left: none !important; border-top: 1px solid var(--border); }
+
+      .edu-block { grid-template-columns: 1fr; max-width: 100%; }
+      .edu-left  { padding: 28px 20px; }
+      .edu-right { border-left: none; border-top: 1px solid var(--border); padding: 28px 20px; }
+      .edu-degree { font-size: 1.5rem; }
+
+      .contact-wrap { grid-template-columns: 1fr; gap: 36px; }
+      .contact-cta  { font-size: clamp(1.8rem, 9vw, 2.6rem); }
+      .contact-link { gap: 12px; padding: 18px 0; }
+      .c-label { width: 64px; font-size: 0.57rem; }
+      .c-value { font-size: 0.78rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .wa-float { right: 14px; bottom: 14px; padding: 11px 12px; }
+
+      footer { padding: 20px; flex-direction: column; gap: 8px; text-align: center; }
+    }
+    @media (max-width: 360px) {
+      .hero h1 { font-size: 2.2rem; }
+      .hero-meta { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════ NAV ═══════════════ -->
+  <nav id="navbar">
+    <div class="logo">Custódior<span>.</span></div>
+    <div class="nav-links">
+      <a href="#operacoes" class="nav-link" data-section="operacoes">Proposta</a>
+      <a href="#cases" class="nav-link" data-section="cases">Cases</a>
+      <a href="#competencias" class="nav-link" data-section="competencias">Stack</a>
+      <a href="#formacao" class="nav-link" data-section="formacao">Formação</a>
+      <a href="#contato" class="nav-link" data-section="contato">Contato</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Abrir menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#operacoes" class="mnav">Proposta</a>
+    <a href="#cases" class="mnav">Cases</a>
+    <a href="#competencias" class="mnav">Stack</a>
+    <a href="#formacao" class="mnav">Formação</a>
+    <a href="#contato" class="mnav">Contato</a>
+  </div>
+
+  <!-- ═══════════════ HERO ═══════════════ -->
+  <section class="hero" id="top">
+    <div class="fade-in">
+      <div class="terminal-badge">FIN.SYS.INIT() — FEIRA DE SANTANA, BR</div>
+      <h1>Finance<br>Analytics<br><span class="accent">&amp; FP&amp;A.</span></h1>
+      <p class="hero-sub"><span id="typing-text"></span><span class="cursor-char"></span></p>
+    </div>
+    <div class="hero-meta fade-in" style="transition-delay:0.18s">
+      <div>
+        <div class="hero-stat-num">1</div>
+        <div class="hero-stat-label">Foco</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">10+</div>
+        <div class="hero-stat-label">Ferramentas no stack</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">5+</div>
+        <div class="hero-stat-label">Playbooks prontos</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ OPERAÇÕES ═══════════════ -->
+  <section id="operacoes">
+    <p class="section-eyebrow fade-in">/ Portfólio de Serviços</p>
+    <h2 class="section-title fade-in">Finanças <span class="muted">/ Sistemas &amp; Decisão</span></h2>
+    <p class="section-desc fade-in">Profissional focado em finanças (FP&amp;A + Analytics). Uso tecnologia para acelerar: fechar números, explicar variâncias e orientar decisões executivas.</p>
+
+    <div class="grid-3 fade-in">
+      <div class="op-card">
+        <div class="op-card-content">
+          <div class="op-card-index">01 — FP&amp;A</div>
+          <div class="op-card-client">FIN.PLANNING</div>
+          <h3>Planejamento &amp; Performance</h3>
+          <p>Orçamento, rolling forecast, análise de desvios e narrativa executiva. Modelos auditáveis (Excel) e data-mart para Power BI.</p>
+          <div class="op-tags">
+            <span class="op-tag">Budget</span>
+            <span class="op-tag">Rolling Forecast</span>
+            <span class="op-tag">3-Statement</span>
+            <span class="op-tag">SQL</span>
+            <span class="op-tag">Excel</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="op-card">
+        <div class="op-card-content">
+          <div class="op-card-index">02 — ANALYTICS</div>
+          <div class="op-card-client">FIN.INTEL</div>
+          <h3>BI &amp; Métricas</h3>
+          <p>Dashboards que respondem perguntas do CFO: “o que aconteceu, por quê e o que fazer agora?”. Modelagem dimensional, métricas e performance em DAX.</p>
+          <div class="op-tags">
+            <span class="op-tag">Power BI</span>
+            <span class="op-tag">DAX</span>
+            <span class="op-tag">Star Schema</span>
+            <span class="op-tag">Power Query</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="op-card">
+        <div class="op-card-content">
+          <div class="op-card-index">03 — AUTOMATION</div>
+          <div class="op-card-client">FIN.SYSTEMS</div>
+          <h3>Automação &amp; IA</h3>
+          <p>Fluxos n8n para consolidar dados, alertar desvios e gerar reports. Agentes de IA com ferramentas (SQL/HTTP) para acelerar rotinas de FP&amp;A.</p>
+          <div class="op-tags">
+            <span class="op-tag">SQL</span>
+            <span class="op-tag">Python</span>
+            <span class="op-tag">n8n</span>
+            <span class="op-tag">AI Agents</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </section>
+
+  <!-- ═══════════════ CASES ═══════════════ -->
+  <section id="cases" style="background: var(--bg-dark); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <p class="section-eyebrow fade-in">/ Portfólio</p>
+    <h2 class="section-title fade-in">Cases <span class="muted">/ Finanças</span></h2>
+    <p class="section-desc fade-in">Estrutura de entrega pensada para finanças corporativas: dado confiável, modelo auditável e comunicação executiva.</p>
+
+    <div class="grid-3 fade-in">
+      <div class="op-card">
+        <div class="op-card-content">
+          <div class="op-card-index">CASE 01 — BOARD PACK</div>
+          <div class="op-card-client">EXEC.REPORTING</div>
+          <h3>Pacote executivo</h3>
+          <p>Relatório mensal com KPIs, variações (R$ / %) e causas. Padrão consistente para diretoria: 1 narrativa, 3 decisões.</p>
+          <div class="op-tags">
+            <span class="op-tag">Power BI</span>
+            <span class="op-tag">DAX</span>
+            <span class="op-tag">Storytelling</span>
+          </div>
+        </div>
+      </div>
+      <div class="op-card">
+        <div class="op-card-content">
+          <div class="op-card-index">CASE 02 — FP&amp;A DATA MART</div>
+          <div class="op-card-client">DATA.MODEL</div>
+          <h3>Modelo de dados</h3>
+          <p>Star schema para receita, custos, budget e centros de custo. Calendário, mapeamento contábil→gerencial e regras de rateio.</p>
+          <div class="op-tags">
+            <span class="op-tag">SQL</span>
+            <span class="op-tag">Power Query</span>
+            <span class="op-tag">Kimball</span>
+          </div>
+        </div>
+      </div>
+      <div class="op-card">
+        <div class="op-card-content">
+          <div class="op-card-index">CASE 03 — AUTOMATION</div>
+          <div class="op-card-client">CLOSE.FAST</div>
+          <h3>Fechamento rápido</h3>
+          <p>Automação de consolidação + alertas de desvio + geração de flash report. Menos tempo “catando dado”, mais tempo analisando.</p>
+          <div class="op-tags">
+            <span class="op-tag">n8n</span>
+            <span class="op-tag">Python</span>
+            <span class="op-tag">AI Agents</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ COMPETÊNCIAS ═══════════════ -->
+  <section id="competencias">
+    <p class="section-eyebrow fade-in">/ Stack</p>
+    <h2 class="section-title fade-in">Ferramentas <span class="muted">/ &amp; Conhecimento</span></h2>
+    <p class="section-desc fade-in">Tecnologia como estrutura (não como fim): dados confiáveis + modelos auditáveis + decisão executiva.</p>
+
+    <div class="skills-wrapper fade-in">
+      <div class="skills-col">
+        <p class="skills-col-title">Tecnologia &amp; Dados</p>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Power BI</div><div class="skill-track"><div class="skill-fill" style="--w:86%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">DAX (performance)</div><div class="skill-track"><div class="skill-fill" style="--w:82%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Excel (modelagem)</div><div class="skill-track"><div class="skill-fill" style="--w:86%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">SQL (Postgres/Supabase)</div><div class="skill-track"><div class="skill-fill" style="--w:80%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Python (dados/forecast)</div><div class="skill-track"><div class="skill-fill" style="--w:78%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">n8n (automação)</div><div class="skill-track"><div class="skill-fill" style="--w:74%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+      </div>
+      <div class="skills-col" style="border-left:1px solid var(--border);">
+        <p class="skills-col-title">Finanças &amp; Gestão</p>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">FP&amp;A (budget/forecast)</div><div class="skill-track"><div class="skill-fill" style="--w:88%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Variance analysis</div><div class="skill-track"><div class="skill-fill" style="--w:86%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">3-Statement model</div><div class="skill-track"><div class="skill-fill" style="--w:82%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Unit economics</div><div class="skill-track"><div class="skill-fill" style="--w:78%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Pricing &amp; margem</div><div class="skill-track"><div class="skill-fill" style="--w:76%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Management reporting</div><div class="skill-track"><div class="skill-fill" style="--w:84%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ FORMAÇÃO ═══════════════ -->
+  <section id="formacao">
+    <p class="section-eyebrow fade-in">/ Base Acadêmica</p>
+    <h2 class="section-title fade-in">Formação <span class="muted">/ Educação</span></h2>
+    <p class="section-desc fade-in">Base que sustenta análise financeira, decisão e execução com tecnologia.</p>
+
+    <div class="edu-block fade-in">
+      <div class="edu-left">
+        <div>
+          <div class="edu-degree">Administração</div>
+          <div class="edu-inst">UNIFACS — Universidade Salvador</div>
+        </div>
+        <div>
+          <div class="edu-status-label">Status</div>
+          <div class="edu-status-val">Formando · 2026</div>
+        </div>
+      </div>
+      <div class="edu-right">
+        <p>Formação em gestão de negócios com foco em estratégia organizacional, finanças corporativas e tomada de decisão baseada em dados. A base teórica vira execução: orçamento, forecasting, análise de margem e reporting.</p>
+        <p>O objetivo é operar como Business Partner: conectar contexto do negócio aos números e aos sistemas (SQL, Power BI, automações) para acelerar decisões com confiança.</p>
+        <div class="edu-tags">
+          <span class="edu-tag">Gestão Estratégica</span>
+          <span class="edu-tag">Finanças Corporativas</span>
+          <span class="edu-tag">Análise de Mercado</span>
+          <span class="edu-tag">Gestão de Operações</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ CONTATO ═══════════════ -->
+  <section id="contato">
+    <div class="contact-wrap">
+      <div class="fade-in">
+        <h2 class="contact-cta">Vamos<br>Construir<br><span>Juntos?</span></h2>
+        <p class="contact-intro">
+          Disponível para projetos em <strong>FP&amp;A, BI e sistemas de finanças</strong> (dados, automação e reporting).<br><br>
+          Feira de Santana, Bahia — BR.
+        </p>
+      </div>
+      <div class="contact-right fade-in" style="transition-delay:0.12s">
+        <form class="contact-form" id="leadForm">
+          <div class="form-title">/ Enviar mensagem (via n8n)</div>
+          <div class="form-grid">
+            <div>
+              <label class="f-label" for="fName">Nome</label>
+              <input class="f-input" id="fName" name="name" type="text" placeholder="Seu nome" autocomplete="name" required>
+            </div>
+            <div>
+              <label class="f-label" for="fCompany">Empresa (opcional)</label>
+              <input class="f-input" id="fCompany" name="company" type="text" placeholder="Empresa / área" autocomplete="organization">
+            </div>
+            <div>
+              <label class="f-label" for="fContact">WhatsApp ou e-mail</label>
+              <input class="f-input" id="fContact" name="contact" type="text" placeholder="+55... ou nome@empresa.com" autocomplete="email" required>
+            </div>
+            <div>
+              <label class="f-label" for="fTopic">Assunto</label>
+              <input class="f-input" id="fTopic" name="topic" type="text" placeholder="Ex: Dashboard FP&A / Forecast / Automação" required>
+            </div>
+            <div class="full">
+              <label class="f-label" for="fMsg">Mensagem</label>
+              <textarea class="f-textarea" id="fMsg" name="message" placeholder="Me diga o contexto, prazo e o resultado que você precisa." required></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit" id="leadSubmit">Enviar</button>
+            <a class="btn ghost" id="waQuick" target="_blank" rel="noopener">WhatsApp direto</a>
+          </div>
+          <div class="form-status" id="formStatus"></div>
+          <div class="form-note">Você pode mandar só WhatsApp. Eu retorno por lá.</div>
+        </form>
+
+        <div class="contact-links">
+          <a href="https://www.linkedin.com/in/rafael-cust%C3%B3dio-a65430370/" target="_blank" class="contact-link" rel="noopener">
+            <span class="c-label">LinkedIn</span>
+            <span class="c-value">linkedin.com/in/rafael-custódio</span>
+            <span class="c-arrow">→</span>
+          </a>
+          <a href="https://wa.me/5575983144766" target="_blank" class="contact-link" rel="noopener">
+            <span class="c-label">WhatsApp</span>
+            <span class="c-value">+55 (75) 98314-4766</span>
+            <span class="c-arrow">→</span>
+          </a>
+          <a href="#" class="contact-link" aria-label="Localização">
+            <span class="c-label">Local</span>
+            <span class="c-value">Feira de Santana, Bahia — BR</span>
+            <span class="c-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <a class="wa-float" href="https://wa.me/5575983144766" target="_blank" rel="noopener">
+    <span class="wa-dot"></span>
+    WhatsApp
+  </a>
+
+  <!-- ═══════════════ FOOTER ═══════════════ -->
+  <footer>
+    <span>Rafael Custódio · 2026</span>
+    <div class="footer-dot"></div>
+    <span>FP&amp;A · Analytics · Finance Systems</span>
+  </footer>
+
+  <!-- ═══════════════ SCRIPTS ═══════════════ -->
+  <script>
+    /* ══════════════════════════════════════════
+       CONTACT FORM → n8n (Webhook or n8n Form)
+    ══════════════════════════════════════════ */
+    // Cole aqui:
+    // - Webhook do n8n: https://.../webhook/SEU_ID
+    // - n8n Form:       https://.../form/SEU_ID
+    const N8N_ENDPOINT_URL = "https://custodior.app.n8n.cloud/webhook/formulario.custodior";
+    const WHATSAPP_NUMBER = "5575983144766";
+
+    function buildWhatsAppUrl(text) {
+      return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+    }
+
+    function updateWaQuick() {
+      const name = document.getElementById('fName')?.value?.trim() || '';
+      const topic = document.getElementById('fTopic')?.value?.trim() || 'Projeto';
+      const msg = document.getElementById('fMsg')?.value?.trim() || '';
+      const text =
+        `Olá, aqui é ${name || 'um visitante do seu site'}. ` +
+        `Assunto: ${topic}. ` +
+        (msg ? `Mensagem: ${msg}` : '');
+      const a = document.getElementById('waQuick');
+      if (a) a.href = buildWhatsAppUrl(text);
+    }
+
+    ['fName','fTopic','fMsg'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', updateWaQuick);
+    });
+    updateWaQuick();
+
+    const leadForm = document.getElementById('leadForm');
+    const leadSubmit = document.getElementById('leadSubmit');
+    const formStatus = document.getElementById('formStatus');
+
+    function setStatus(text, kind) {
+      if (!formStatus) return;
+      formStatus.textContent = text || '';
+      formStatus.classList.remove('ok', 'err');
+      if (kind) formStatus.classList.add(kind);
+    }
+
+    function isN8nFormUrl(url) {
+      return String(url || '').includes('/form/');
+    }
+
+    async function submitLead(payload) {
+      if (!N8N_ENDPOINT_URL || N8N_ENDPOINT_URL.includes("COLE_AQUI")) {
+        throw new Error("Endpoint do n8n não configurado.");
+      }
+
+      // n8n Forms (/form/...) normalmente esperam dados como "form submit" (urlencoded),
+      // enquanto Webhooks aceitam bem JSON.
+      const asForm = isN8nFormUrl(N8N_ENDPOINT_URL);
+
+      const res = await fetch(N8N_ENDPOINT_URL, {
+        method: 'POST',
+        headers: asForm
+          ? { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }
+          : { 'Content-Type': 'application/json' },
+        body: asForm
+          ? new URLSearchParams(payload).toString()
+          : JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error("Falha ao enviar. Tente novamente.");
+      return true;
+    }
+
+    if (leadForm) {
+      leadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        setStatus('Enviando...', null);
+        if (leadSubmit) leadSubmit.disabled = true;
+
+        const payload = {
+          source: 'ptf.html',
+          ts: new Date().toISOString(),
+          name: document.getElementById('fName')?.value?.trim() || '',
+          company: document.getElementById('fCompany')?.value?.trim() || '',
+          contact: document.getElementById('fContact')?.value?.trim() || '',
+          topic: document.getElementById('fTopic')?.value?.trim() || '',
+          message: document.getElementById('fMsg')?.value?.trim() || '',
+          page: location.href,
+          userAgent: navigator.userAgent,
+        };
+
+        try {
+          await submitLead(payload);
+          setStatus('Enviado. Vou te chamar no WhatsApp.', 'ok');
+          leadForm.reset();
+          updateWaQuick();
+        } catch (err) {
+          setStatus(`${err.message} Você também pode usar o WhatsApp direto.`, 'err');
+        } finally {
+          if (leadSubmit) leadSubmit.disabled = false;
+        }
+      });
+    }
+
+    /* ── Typing effect ── */
+    const phrases = [
+      "Fechamento mais rápido. Decisão mais clara. Execução com confiança.",
+      "FP&A · Power BI · DAX · SQL · Excel · Automação.",
+      "Dados confiáveis → análise de variância → narrativa executiva."
+    ];
+    let phraseIdx = 0, charIdx = 0, deleting = false;
+    const typEl = document.getElementById('typing-text');
+
+    function type() {
+      const cur = phrases[phraseIdx];
+      typEl.textContent = deleting
+        ? cur.slice(0, --charIdx)
+        : cur.slice(0, ++charIdx);
+
+      if (!deleting && charIdx === cur.length) {
+        deleting = true;
+        return setTimeout(type, 2200);
+      }
+      if (deleting && charIdx === 0) {
+        deleting = false;
+        phraseIdx = (phraseIdx + 1) % phrases.length;
+      }
+      setTimeout(type, deleting ? 22 : 38);
+    }
+    setTimeout(type, 700);
+
+    /* ── Hamburger / mobile menu ── */
+    const ham = document.getElementById('hamburger');
+    const mob = document.getElementById('mobileMenu');
+    ham.addEventListener('click', () => {
+      const open = mob.classList.toggle('open');
+      ham.classList.toggle('open', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    document.querySelectorAll('.mnav').forEach(a => {
+      a.addEventListener('click', () => {
+        mob.classList.remove('open');
+        ham.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    });
+
+    /* ── Nav scroll effects + scrollspy ── */
+    const navbar   = document.getElementById('navbar');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('section[id]');
+
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 40);
+
+      let current = '';
+      sections.forEach(sec => {
+        if (window.scrollY >= sec.offsetTop - 120) current = sec.id;
+      });
+      navLinks.forEach(a => a.classList.toggle('active', a.dataset.section === current));
+    }, { passive: true });
+
+    /* ── Fade-in observer + skill bars ── */
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('visible');
+        entry.target.querySelectorAll('.skill-fill').forEach(b => b.classList.add('animate'));
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    /* ── Op-card dynamic glow ── */
+    document.querySelectorAll('.op-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        card.style.setProperty('--mouse-x', (e.clientX - r.left) + 'px');
+        card.style.setProperty('--mouse-y', (e.clientY - r.top)  + 'px');
+      });
+    });
+
+
+  </script>
+</body>
+</html>
