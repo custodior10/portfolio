@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rafael Custódio · FP&amp;A · Analytics · Finance Systems</title>
+  <title>Rafael Custódio · Dev de Soluções Inteligentes · Web · Python · Automação</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,9 +18,9 @@
       --bg-surface:   #0d0d0d;
       --bg-card:      #111111;
       --accent:       #00BFFF;
-      --accent-dim:   rgba(0, 191, 255, 0.08);
-      --accent-mid:   rgba(0, 191, 255, 0.18);
-      --accent-border:rgba(0, 191, 255, 0.30);
+      --accent-dim:   #00bfff14;
+      --accent-mid:   #00bfff2e;
+      --accent-border:#00bfff4d;
       --text-main:    #ffffff;
       --text-muted:   #606060;
       --text-soft:    #999999;
@@ -154,40 +154,113 @@
     .mobile-menu a:hover { color: var(--accent); }
 
     /* ══════════════════════════════════════════
-       HERO
+       HERO — SPLIT INTERACTIVE PORTRAIT
     ══════════════════════════════════════════ */
     .hero {
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 120px 50px 80px;
+      flex-direction: row;
+      align-items: stretch;
+      padding: 0;
       position: relative;
       border-bottom: 1px solid var(--border);
       overflow: hidden;
     }
 
-    /* Ambient glow orbs */
+    /* Subtle ambient glow on left side */
     .hero::before {
       content: '';
       position: absolute;
-      top: 10%; right: -8%;
-      width: 680px; height: 680px;
-      background: radial-gradient(circle, rgba(0,191,255,0.055) 0%, transparent 68%);
+      top: 20%; left: -10%;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(0,191,255,0.04) 0%, transparent 68%);
       pointer-events: none;
       animation: orb-drift 12s ease-in-out infinite alternate;
-    }
-    .hero::after {
-      content: '';
-      position: absolute;
-      bottom: -10%; left: -5%;
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(0,191,255,0.03) 0%, transparent 70%);
-      pointer-events: none;
+      z-index: 0;
     }
     @keyframes orb-drift {
       from { transform: translate(0, 0) scale(1); }
-      to   { transform: translate(-30px, 30px) scale(1.08); }
+      to   { transform: translate(20px, -30px) scale(1.08); }
+    }
+
+    /* ── Left column: text content ── */
+    .hero-content {
+      flex: 0 0 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 60px 80px 50px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── Right column: portrait ── */
+    .hero-image-container {
+      flex: 0 0 50%;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    /* Vertical separator line */
+    .hero-image-container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 1px; height: 100%;
+      background: linear-gradient(to bottom,
+        transparent 0%,
+        var(--accent-border) 30%,
+        var(--accent-border) 70%,
+        transparent 100%
+      );
+      z-index: 3;
+      opacity: 0.6;
+    }
+
+    /* Background accent gradient behind image */
+    .hero-image-container::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 60% at 50% 80%, rgba(0,191,255,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 50% 100%, rgba(0,191,255,0.05) 0%, transparent 60%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .hero-image-container img {
+      display: block;
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+      object-position: top center;
+      position: relative;
+      z-index: 2;
+      transform: scale(1.05);
+      transition: transform 0.05s linear;
+      /* Neon glow that pulses */
+      filter:
+        drop-shadow(0 0 28px rgba(0,191,255,0.45))
+        drop-shadow(0 0 72px rgba(0,191,255,0.18));
+      animation: neon-pulse 3.5s ease-in-out infinite alternate;
+      will-change: transform, filter;
+    }
+
+    @keyframes neon-pulse {
+      from {
+        filter:
+          drop-shadow(0 0 22px rgba(0,191,255,0.40))
+          drop-shadow(0 0 60px rgba(0,191,255,0.14));
+      }
+      to {
+        filter:
+          drop-shadow(0 0 38px rgba(0,191,255,0.65))
+          drop-shadow(0 0 100px rgba(0,191,255,0.25));
+      }
     }
 
     .terminal-badge {
@@ -215,7 +288,7 @@
 
     .hero h1 {
       font-family: var(--font-display);
-      font-size: clamp(3.2rem, 8vw, 6.8rem);
+      font-size: clamp(3.2rem, 5.5vw, 6.8rem);
       font-weight: 800;
       line-height: 1.0;
       text-transform: uppercase;
@@ -229,7 +302,7 @@
       font-weight: 300;
       color: var(--text-muted);
       font-size: 0.88rem;
-      max-width: 540px;
+      max-width: 480px;
       line-height: 1.9;
       min-height: 2.4em;
     }
@@ -243,10 +316,10 @@
     }
 
     .hero-meta {
-      margin-top: 64px;
+      margin-top: 56px;
       display: flex;
-      gap: 64px;
-      padding-top: 40px;
+      gap: 48px;
+      padding-top: 36px;
       border-top: 1px solid var(--border);
     }
     .hero-stat-num {
@@ -318,7 +391,6 @@
                   border-color 0.3s ease,
                   background 0.2s;
     }
-    /* Dynamic cursor glow (set via JS) */
     .op-card::before {
       content: '';
       position: absolute;
@@ -332,7 +404,6 @@
       pointer-events: none;
       z-index: 0;
     }
-    /* Top accent bar */
     .op-card::after {
       content: '';
       position: absolute;
@@ -457,15 +528,72 @@
     /* ══════════════════════════════════════════
        FORMAÇÃO
     ══════════════════════════════════════════ */
+<section id="formacao">
+    <p class="section-eyebrow fade-in">/ Base Acadêmica</p>
+    <h2 class="section-title fade-in">Formação <span class="muted">/ Educação</span></h2>
+    <p class="section-desc fade-in">O diferencial técnico está na interseção entre gestão e código — entender o negócio para construir a solução certa.</p>
+
+    <div class="edu-block fade-in">
+      <div class="edu-left">
+        <div>
+          <div class="edu-status-label">Graduação Principal</div>
+          <div class="edu-status-val">Formando · 2026</div>
+
+          <h3 class="edu-degree" style="margin-top: 16px;">Administração</h3>
+          <p class="edu-inst">UNIFACS — SANTA MÔNICA</p>
+        </div>
+
+        <div class="edu-tags">
+          <span class="edu-tag">FINANCE</span>
+          <span class="edu-tag">STRATEGY</span>
+          <span class="edu-tag">DATA OPS</span>
+        </div>
+      </div>
+
+      <div class="edu-right">
+        <div class="edu-status-label">Especializações & Extensões de Alto Nível</div>
+
+        <div style="margin-top: 16px; margin-bottom: 32px; border-bottom: 1px solid var(--border); padding-bottom: 20px;">
+          <h4 style="color: var(--text-main); font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 8px;">
+            Python para Finanças & Data Science
+          </h4>
+          <p style="margin-bottom: 0;">
+            Certificação focada em análise preditiva, automação de processos e manipulação de bases de dados. Conteúdo alinhado aos programas de extensão das <strong>Universidades Federais e USP</strong>.
+          </p>
+        </div>
+
+        <div style="margin-bottom: 32px; border-bottom: 1px solid var(--border); padding-bottom: 20px;">
+          <h4 style="color: var(--text-main); font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 8px;">
+            Full Stack Web Dev & SEO Performance
+          </h4>
+          <p style="margin-bottom: 0;">
+            Especialização em arquitetura de sistemas e otimização técnica. Foco em transformar interfaces em ferramentas de conversão digital rápida e escalável.
+          </p>
+        </div>
+
+        <div>
+          <h4 style="color: var(--text-main); font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 8px;">
+            Business Intelligence & FP&A Avançado
+          </h4>
+          <p style="margin-bottom: 0;">
+            Modelagem de cenários e estruturação de dashboards estratégicos. Integração de BI com processos de automação para suporte direto à decisão executiva.
+          </p>
+        </div>
+      </div>
+    </div>
+/* ── Estilização da Seção Formação ── */
+/* ══════════════════════════════════════════
+       FORMAÇÃO (ATUALIZADO COM GRID E CASES)
+    ══════════════════════════════════════════ */
     #formacao { background: var(--bg-surface); }
 
     .edu-block {
       display: grid;
       grid-template-columns: 1fr 2fr;
       gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      max-width: 960px;
+      background: var(--accent-border); /* Troquei a borda genérica pelo seu azul neon */
+      border: 1px solid var(--accent-border);
+      max-width: 1000px;
     }
     .edu-left {
       background: var(--bg-card);
@@ -480,6 +608,7 @@
       font-weight: 800;
       text-transform: uppercase;
       line-height: 1.1;
+      color: var(--text-main);
     }
     .edu-inst {
       font-family: var(--font-code);
@@ -492,13 +621,35 @@
     .edu-right {
       background: var(--bg-card);
       padding: 48px 40px;
-      border-left: 1px solid var(--border);
     }
     .edu-right p {
       color: var(--text-muted);
       font-size: 0.88rem;
-      line-height: 1.9;
+      line-height: 1.7;
+    }
+    .spec-block {
+      padding-bottom: 24px;
       margin-bottom: 24px;
+      border-bottom: 1px solid var(--accent-border);
+    }
+    .spec-block:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .spec-block h4 {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-main);
+      letter-spacing: 0.2px;
+      margin-bottom: 10px;
+    }
+    .spec-block p {
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      line-height: 1.75;
     }
     .edu-status-label {
       font-family: var(--font-code);
@@ -513,13 +664,46 @@
       font-size: 0.72rem;
       color: var(--accent);
     }
-    .edu-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .edu-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
     .edu-tag {
       font-family: var(--font-code);
       font-size: 0.6rem;
       color: var(--text-muted);
-      border: 1px solid var(--border);
+      border: 1px solid var(--accent-border);
       padding: 4px 10px;
+    }
+
+    /* Spec blocks inside edu-right */
+    .edu-spec-block {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 18px;
+      align-items: start;
+      padding-bottom: 28px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid var(--accent-border);
+    }
+    .edu-spec-index {
+      font-family: var(--font-code);
+      font-size: 0.58rem;
+      color: var(--accent);
+      letter-spacing: 1px;
+      padding-top: 3px;
+      opacity: 0.7;
+    }
+    .edu-spec-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-main);
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+      margin-bottom: 10px;
+    }
+    .edu-spec-desc {
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      line-height: 1.75;
     }
 
     /* ══════════════════════════════════════════
@@ -754,7 +938,30 @@
 
       section { padding: 64px 20px; }
 
-      .hero { min-height: 100svh; padding: 90px 20px 48px; justify-content: flex-end; }
+      /* Hero — mobile: portrait on top, text below */
+      .hero {
+        flex-direction: column;
+        min-height: 100svh;
+      }
+      .hero-image-container {
+        flex: 0 0 55vw;
+        width: 100%;
+        height: 55vw;
+        max-height: 72vw;
+        order: -1; /* image first */
+      }
+      .hero-image-container::before { display: none; }
+      .hero-image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top center;
+      }
+      .hero-content {
+        flex: 1;
+        padding: 32px 20px 48px;
+        justify-content: flex-start;
+      }
       .terminal-badge { font-size: 0.6rem; padding: 5px 10px; margin-bottom: 20px; white-space: normal; line-height: 1.6; }
       .hero h1 { font-size: clamp(2.6rem, 12vw, 3.8rem); margin-bottom: 18px; letter-spacing: -0.5px; }
       .hero-sub { font-size: 0.76rem; min-height: 3.6em; }
@@ -799,7 +1006,7 @@
   <nav id="navbar">
     <div class="logo">Custódior<span>.</span></div>
     <div class="nav-links">
-      <a href="#operacoes" class="nav-link" data-section="operacoes">Proposta</a>
+      <a href="#operacoes" class="nav-link" data-section="operacoes">Serviços</a>
       <a href="#cases" class="nav-link" data-section="cases">Cases</a>
       <a href="#competencias" class="nav-link" data-section="competencias">Stack</a>
       <a href="#formacao" class="nav-link" data-section="formacao">Formação</a>
@@ -811,7 +1018,7 @@
   </nav>
 
   <div class="mobile-menu" id="mobileMenu">
-    <a href="#operacoes" class="mnav">Proposta</a>
+    <a href="#operacoes" class="mnav">Serviços</a>
     <a href="#cases" class="mnav">Cases</a>
     <a href="#competencias" class="mnav">Stack</a>
     <a href="#formacao" class="mnav">Formação</a>
@@ -820,127 +1027,137 @@
 
   <!-- ═══════════════ HERO ═══════════════ -->
   <section class="hero" id="top">
-    <div class="fade-in">
-      <div class="terminal-badge">FIN.SYS.INIT() — FEIRA DE SANTANA, BR</div>
-      <h1>Finance<br>Analytics<br><span class="accent">&amp; FP&amp;A.</span></h1>
-      <p class="hero-sub"><span id="typing-text"></span><span class="cursor-char"></span></p>
+
+    <!-- LEFT — text column -->
+    <div class="hero-content">
+      <div class="fade-in">
+        <div class="terminal-badge">DEV.INIT() — FEIRA DE SANTANA, BR · DISPONÍVEL PARA PROJETOS</div>
+        <h1>Web.<br>Python.<br><span class="accent">&amp; Soluções.</span></h1>
+        <p class="hero-sub"><span id="typing-text"></span><span class="cursor-char"></span></p>
+      </div>
+      <div class="hero-meta fade-in" style="transition-delay:0.18s">
+        <div>
+          <div class="hero-stat-num">Full</div>
+          <div class="hero-stat-label">Stack Dev</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">10+</div>
+          <div class="hero-stat-label">Ferramentas no stack</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">3×1</div>
+          <div class="hero-stat-label">Web · Python · Negócios</div>
+        </div>
+      </div>
     </div>
-    <div class="hero-meta fade-in" style="transition-delay:0.18s">
-      <div>
-        <div class="hero-stat-num">1</div>
-        <div class="hero-stat-label">Foco</div>
-      </div>
-      <div>
-        <div class="hero-stat-num">10+</div>
-        <div class="hero-stat-label">Ferramentas no stack</div>
-      </div>
-      <div>
-        <div class="hero-stat-num">5+</div>
-        <div class="hero-stat-label">Playbooks prontos</div>
-      </div>
+
+    <!-- RIGHT — portrait column -->
+    <div class="hero-image-container" id="heroImgWrap">
+      <img src="perfil.png" alt="Rafael Custódio — Dev de Soluções Inteligentes" id="heroPortrait">
     </div>
+
   </section>
 
   <!-- ═══════════════ OPERAÇÕES ═══════════════ -->
   <section id="operacoes">
     <p class="section-eyebrow fade-in">/ Portfólio de Serviços</p>
-    <h2 class="section-title fade-in">Finanças <span class="muted">/ Sistemas &amp; Decisão</span></h2>
-    <p class="section-desc fade-in">Profissional focado em finanças (FP&amp;A + Analytics). Uso tecnologia para acelerar: fechar números, explicar variâncias e orientar decisões executivas.</p>
+    <h2 class="section-title fade-in">Soluções <span class="muted">/ Código &amp; Estratégia</span></h2>
+    <p class="section-desc fade-in">Desenvolvedor com visão de negócios. Construo desde a landing page até o backend e a automação — entregando sistemas que resolvem problemas reais, não apenas código bonito.</p>
 
     <div class="grid-3 fade-in">
       <div class="op-card">
         <div class="op-card-content">
-          <div class="op-card-index">01 — FP&amp;A</div>
-          <div class="op-card-client">FIN.PLANNING</div>
-          <h3>Planejamento &amp; Performance</h3>
-          <p>Orçamento, rolling forecast, análise de desvios e narrativa executiva. Modelos auditáveis (Excel) e data-mart para Power BI.</p>
+          <div class="op-card-index">01 — WEB DEV</div>
+          <div class="op-card-client">FRONT.END</div>
+          <h3>Desenvolvimento Web</h3>
+          <p>Landing pages e sites institucionais de alta conversão. Front-end moderno, responsivo e otimizado para SEO: rápido nos buscadores, preciso nos dispositivos.</p>
           <div class="op-tags">
-            <span class="op-tag">Budget</span>
-            <span class="op-tag">Rolling Forecast</span>
-            <span class="op-tag">3-Statement</span>
-            <span class="op-tag">SQL</span>
-            <span class="op-tag">Excel</span>
+            <span class="op-tag">HTML/CSS/JS</span>
+            <span class="op-tag">React</span>
+            <span class="op-tag">SEO Técnico</span>
+            <span class="op-tag">Performance</span>
+            <span class="op-tag">Responsivo</span>
           </div>
         </div>
       </div>
 
       <div class="op-card">
         <div class="op-card-content">
-          <div class="op-card-index">02 — ANALYTICS</div>
-          <div class="op-card-client">FIN.INTEL</div>
-          <h3>BI &amp; Métricas</h3>
-          <p>Dashboards que respondem perguntas do CFO: “o que aconteceu, por quê e o que fazer agora?”. Modelagem dimensional, métricas e performance em DAX.</p>
+          <div class="op-card-index">02 — BACKEND</div>
+          <div class="op-card-client">SYS.CUSTOM</div>
+          <h3>Sistemas Customizados</h3>
+          <p>Backends em Python para lógica de negócio complexa: APIs REST, integrações entre plataformas, manipulação de dados financeiros e automação de processos.</p>
           <div class="op-tags">
-            <span class="op-tag">Power BI</span>
-            <span class="op-tag">DAX</span>
-            <span class="op-tag">Star Schema</span>
-            <span class="op-tag">Power Query</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="op-card">
-        <div class="op-card-content">
-          <div class="op-card-index">03 — AUTOMATION</div>
-          <div class="op-card-client">FIN.SYSTEMS</div>
-          <h3>Automação &amp; IA</h3>
-          <p>Fluxos n8n para consolidar dados, alertar desvios e gerar reports. Agentes de IA com ferramentas (SQL/HTTP) para acelerar rotinas de FP&amp;A.</p>
-          <div class="op-tags">
-            <span class="op-tag">SQL</span>
             <span class="op-tag">Python</span>
+            <span class="op-tag">FastAPI</span>
+            <span class="op-tag">REST APIs</span>
+            <span class="op-tag">SQL</span>
             <span class="op-tag">n8n</span>
-            <span class="op-tag">AI Agents</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="op-card">
+        <div class="op-card-content">
+          <div class="op-card-index">03 — CONSULTORIA</div>
+          <div class="op-card-client">BIZ.TECH</div>
+          <h3>Consultoria Técnica</h3>
+          <p>Onde Administração encontra Tecnologia. Diagnóstico do problema de negócio → arquitetura da solução → entrega. Sem jargão. Com resultado mensurável.</p>
+          <div class="op-tags">
+            <span class="op-tag">Análise de Negócio</span>
+            <span class="op-tag">Arquitetura</span>
+            <span class="op-tag">BI</span>
+            <span class="op-tag">Automação</span>
           </div>
         </div>
       </div>
     </div>
-
-
   </section>
 
   <!-- ═══════════════ CASES ═══════════════ -->
   <section id="cases" style="background: var(--bg-dark); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
     <p class="section-eyebrow fade-in">/ Portfólio</p>
-    <h2 class="section-title fade-in">Cases <span class="muted">/ Finanças</span></h2>
-    <p class="section-desc fade-in">Estrutura de entrega pensada para finanças corporativas: dado confiável, modelo auditável e comunicação executiva.</p>
+    <h2 class="section-title fade-in">Cases <span class="muted">/ Entregas Reais</span></h2>
+    <p class="section-desc fade-in">Cada projeto começa com um problema de negócio claro. A solução pode ser uma página, um script ou um sistema — o critério é o resultado.</p>
 
     <div class="grid-3 fade-in">
       <div class="op-card">
         <div class="op-card-content">
-          <div class="op-card-index">CASE 01 — BOARD PACK</div>
-          <div class="op-card-client">EXEC.REPORTING</div>
-          <h3>Pacote executivo</h3>
-          <p>Relatório mensal com KPIs, variações (R$ / %) e causas. Padrão consistente para diretoria: 1 narrativa, 3 decisões.</p>
+          <div class="op-card-index">CASE 01 — LANDING PAGE</div>
+          <div class="op-card-client">WEB.CONVERSION</div>
+          <h3>Site de Alta Conversão</h3>
+          <p>Landing page responsiva com foco em performance e SEO técnico. Estrutura semântica, Core Web Vitals otimizados e integração com CRM para captura de leads.</p>
           <div class="op-tags">
-            <span class="op-tag">Power BI</span>
-            <span class="op-tag">DAX</span>
-            <span class="op-tag">Storytelling</span>
+            <span class="op-tag">HTML/CSS/JS</span>
+            <span class="op-tag">SEO On-Page</span>
+            <span class="op-tag">Core Web Vitals</span>
           </div>
         </div>
       </div>
       <div class="op-card">
         <div class="op-card-content">
-          <div class="op-card-index">CASE 02 — FP&amp;A DATA MART</div>
-          <div class="op-card-client">DATA.MODEL</div>
-          <h3>Modelo de dados</h3>
-          <p>Star schema para receita, custos, budget e centros de custo. Calendário, mapeamento contábil→gerencial e regras de rateio.</p>
+          <div class="op-card-index">CASE 02 — AUTOMAÇÃO PYTHON</div>
+          <div class="op-card-client">PROC.AUTOMATION</div>
+          <h3>Pipeline de Dados</h3>
+          <p>Script Python que consolida relatórios de múltiplas fontes, valida inconsistências e gera alertas automáticos — eliminando horas de trabalho manual por semana.</p>
           <div class="op-tags">
-            <span class="op-tag">SQL</span>
-            <span class="op-tag">Power Query</span>
-            <span class="op-tag">Kimball</span>
-          </div>
-        </div>
-      </div>
-      <div class="op-card">
-        <div class="op-card-content">
-          <div class="op-card-index">CASE 03 — AUTOMATION</div>
-          <div class="op-card-client">CLOSE.FAST</div>
-          <h3>Fechamento rápido</h3>
-          <p>Automação de consolidação + alertas de desvio + geração de flash report. Menos tempo “catando dado”, mais tempo analisando.</p>
-          <div class="op-tags">
-            <span class="op-tag">n8n</span>
             <span class="op-tag">Python</span>
-            <span class="op-tag">AI Agents</span>
+            <span class="op-tag">Pandas</span>
+            <span class="op-tag">API Integration</span>
+          </div>
+        </div>
+      </div>
+      <div class="op-card">
+        <div class="op-card-content">
+          <div class="op-card-index">CASE 03 — SISTEMA + BI</div>
+          <div class="op-card-client">FULL.SOLUTION</div>
+          <h3>Solução Completa</h3>
+          <p>Desde o backend (Python + SQL) até o dashboard executivo (Power BI), com automação n8n para fechar o ciclo. Dado confiável → decisão rápida.</p>
+          <div class="op-tags">
+            <span class="op-tag">Python</span>
+            <span class="op-tag">Power BI</span>
+            <span class="op-tag">n8n</span>
+            <span class="op-tag">SQL</span>
           </div>
         </div>
       </div>
@@ -951,26 +1168,26 @@
   <section id="competencias">
     <p class="section-eyebrow fade-in">/ Stack</p>
     <h2 class="section-title fade-in">Ferramentas <span class="muted">/ &amp; Conhecimento</span></h2>
-    <p class="section-desc fade-in">Tecnologia como estrutura (não como fim): dados confiáveis + modelos auditáveis + decisão executiva.</p>
+    <p class="section-desc fade-in">Tecnologia como estrutura, não como fim. Cada ferramenta escolhida para resolver um problema real — rápido, auditável e escalável.</p>
 
     <div class="skills-wrapper fade-in">
       <div class="skills-col">
-        <p class="skills-col-title">Tecnologia &amp; Dados</p>
-        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Power BI</div><div class="skill-track"><div class="skill-fill" style="--w:86%"></div></div></div><span class="skill-badge">Aplicado</span></div>
-        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">DAX (performance)</div><div class="skill-track"><div class="skill-fill" style="--w:82%"></div></div></div><span class="skill-badge">Aplicado</span></div>
-        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Excel (modelagem)</div><div class="skill-track"><div class="skill-fill" style="--w:86%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <p class="skills-col-title">Desenvolvimento &amp; Web</p>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">HTML · CSS · JavaScript</div><div class="skill-track"><div class="skill-fill" style="--w:90%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">React (Front-end moderno)</div><div class="skill-track"><div class="skill-fill" style="--w:82%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Python (Backend / Scripts)</div><div class="skill-track"><div class="skill-fill" style="--w:85%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">SEO Técnico &amp; Performance</div><div class="skill-track"><div class="skill-fill" style="--w:80%"></div></div></div><span class="skill-badge">Aplicado</span></div>
         <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">SQL (Postgres/Supabase)</div><div class="skill-track"><div class="skill-fill" style="--w:80%"></div></div></div><span class="skill-badge">Aplicado</span></div>
-        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Python (dados/forecast)</div><div class="skill-track"><div class="skill-fill" style="--w:78%"></div></div></div><span class="skill-badge">Aplicado</span></div>
-        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">n8n (automação)</div><div class="skill-track"><div class="skill-fill" style="--w:74%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">n8n · Automação de Fluxos</div><div class="skill-track"><div class="skill-fill" style="--w:78%"></div></div></div><span class="skill-badge">Aplicado</span></div>
       </div>
       <div class="skills-col" style="border-left:1px solid var(--border);">
-        <p class="skills-col-title">Finanças &amp; Gestão</p>
-        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">FP&amp;A (budget/forecast)</div><div class="skill-track"><div class="skill-fill" style="--w:88%"></div></div></div><span class="skill-badge">Aplicado</span></div>
-        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Variance analysis</div><div class="skill-track"><div class="skill-fill" style="--w:86%"></div></div></div><span class="skill-badge">Aplicado</span></div>
-        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">3-Statement model</div><div class="skill-track"><div class="skill-fill" style="--w:82%"></div></div></div><span class="skill-badge">Aplicado</span></div>
-        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Unit economics</div><div class="skill-track"><div class="skill-fill" style="--w:78%"></div></div></div><span class="skill-badge">Aplicado</span></div>
-        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Pricing &amp; margem</div><div class="skill-track"><div class="skill-fill" style="--w:76%"></div></div></div><span class="skill-badge">Aplicado</span></div>
-        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Management reporting</div><div class="skill-track"><div class="skill-fill" style="--w:84%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <p class="skills-col-title">Dados, BI &amp; Negócios</p>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Python (Pandas / APIs)</div><div class="skill-track"><div class="skill-fill" style="--w:85%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Power BI · DAX</div><div class="skill-track"><div class="skill-fill" style="--w:86%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Excel (modelagem avançada)</div><div class="skill-track"><div class="skill-fill" style="--w:86%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Análise de Negócio / FP&A</div><div class="skill-track"><div class="skill-fill" style="--w:84%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Integração de APIs REST</div><div class="skill-track"><div class="skill-fill" style="--w:82%"></div></div></div><span class="skill-badge">Aplicado</span></div>
+        <div class="skill-row"><div class="skill-bar-wrap"><div class="skill-name">Automação de Processos</div><div class="skill-track"><div class="skill-fill" style="--w:80%"></div></div></div><span class="skill-badge">Aplicado</span></div>
       </div>
     </div>
   </section>
@@ -979,27 +1196,47 @@
   <section id="formacao">
     <p class="section-eyebrow fade-in">/ Base Acadêmica</p>
     <h2 class="section-title fade-in">Formação <span class="muted">/ Educação</span></h2>
-    <p class="section-desc fade-in">Base que sustenta análise financeira, decisão e execução com tecnologia.</p>
+    <p class="section-desc fade-in">O diferencial técnico está na interseção entre gestão e código — entender o negócio para construir a solução certa.</p>
 
     <div class="edu-block fade-in">
       <div class="edu-left">
         <div>
-          <div class="edu-degree">Administração</div>
-          <div class="edu-inst">UNIFACS — Universidade Salvador</div>
-        </div>
-        <div>
-          <div class="edu-status-label">Status</div>
+          <div class="edu-status-label">Graduação Principal</div>
           <div class="edu-status-val">Formando · 2026</div>
+          <div class="edu-degree" style="margin-top:16px;">Administração</div>
+          <div class="edu-inst">UNIFACS — Campus Santa Mônica</div>
+        </div>
+        <div class="edu-tags">
+          <span class="edu-tag">FINANCE</span>
+          <span class="edu-tag">STRATEGY</span>
+          <span class="edu-tag">DATA OPS</span>
         </div>
       </div>
       <div class="edu-right">
-        <p>Formação em gestão de negócios com foco em estratégia organizacional, finanças corporativas e tomada de decisão baseada em dados. A base teórica vira execução: orçamento, forecasting, análise de margem e reporting.</p>
-        <p>O objetivo é operar como Business Partner: conectar contexto do negócio aos números e aos sistemas (SQL, Power BI, automações) para acelerar decisões com confiança.</p>
-        <div class="edu-tags">
-          <span class="edu-tag">Gestão Estratégica</span>
-          <span class="edu-tag">Finanças Corporativas</span>
-          <span class="edu-tag">Análise de Mercado</span>
-          <span class="edu-tag">Gestão de Operações</span>
+        <div class="edu-status-label" style="margin-bottom:20px;">Especializações &amp; Extensões</div>
+
+        <div class="edu-spec-block">
+          <div class="edu-spec-index">01</div>
+          <div class="edu-spec-body">
+            <h4 class="edu-spec-title">Python para Finanças &amp; Data Science</h4>
+            <p class="edu-spec-desc">Análise preditiva, automação de processos e manipulação de bases de dados financeiras com Python. Conteúdo alinhado aos programas de extensão das <strong style="color:var(--text-soft);">Universidades Federais e USP</strong> — cobrindo pandas, modelagem estatística, séries temporais e pipelines de forecast aplicados a finanças corporativas.</p>
+          </div>
+        </div>
+
+        <div class="edu-spec-block">
+          <div class="edu-spec-index">02</div>
+          <div class="edu-spec-body">
+            <h4 class="edu-spec-title">Full Stack Web Dev &amp; SEO Performance</h4>
+            <p class="edu-spec-desc">Especialização em arquitetura de sistemas escaláveis e otimização técnica de performance. Foco em transformar interfaces em ferramentas de conversão digital: Core Web Vitals, estrutura semântica e estratégias de busca orgânica de alto impacto — do front-end ao deploy.</p>
+          </div>
+        </div>
+
+        <div class="edu-spec-block" style="border-bottom:none; padding-bottom:0; margin-bottom:0;">
+          <div class="edu-spec-index">03</div>
+          <div class="edu-spec-body">
+            <h4 class="edu-spec-title">Business Intelligence &amp; FP&amp;A Avançado</h4>
+            <p class="edu-spec-desc">Modelagem de cenários financeiros, estruturação de data marts e dashboards estratégicos para suporte direto à decisão executiva. Integração de BI com fluxos de automação — dado confiável, narrativa clara e resposta ágil para CFOs e lideranças.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1009,9 +1246,10 @@
   <section id="contato">
     <div class="contact-wrap">
       <div class="fade-in">
-        <h2 class="contact-cta">Vamos<br>Construir<br><span>Juntos?</span></h2>
+        <h2 class="contact-cta">Tem um<br>Problema?<br><span>Resolvo.</span></h2>
         <p class="contact-intro">
-          Disponível para projetos em <strong>FP&amp;A, BI e sistemas de finanças</strong> (dados, automação e reporting).<br><br>
+          Disponível para freelas e projetos em <strong>Web Dev, Python, Automação e Consultoria Técnica</strong>.<br><br>
+          Mando proposta ainda hoje — só me conta o contexto.<br><br>
           Feira de Santana, Bahia — BR.
         </p>
       </div>
@@ -1033,11 +1271,11 @@
             </div>
             <div>
               <label class="f-label" for="fTopic">Assunto</label>
-              <input class="f-input" id="fTopic" name="topic" type="text" placeholder="Ex: Dashboard FP&A / Forecast / Automação" required>
+              <input class="f-input" id="fTopic" name="topic" type="text" placeholder="Ex: Site · API Python · Automação · BI" required>
             </div>
             <div class="full">
               <label class="f-label" for="fMsg">Mensagem</label>
-              <textarea class="f-textarea" id="fMsg" name="message" placeholder="Me diga o contexto, prazo e o resultado que você precisa." required></textarea>
+              <textarea class="f-textarea" id="fMsg" name="message" placeholder="Me conta o contexto, o problema e o resultado que você precisa. Sem enrolação." required></textarea>
             </div>
           </div>
           <div class="form-actions">
@@ -1045,7 +1283,7 @@
             <a class="btn ghost" id="waQuick" target="_blank" rel="noopener">WhatsApp direto</a>
           </div>
           <div class="form-status" id="formStatus"></div>
-          <div class="form-note">Você pode mandar só WhatsApp. Eu retorno por lá.</div>
+          <div class="form-note">Prefere mandar uma mensagem rápida? Vai no WhatsApp — respondo no mesmo dia.</div>
         </form>
 
         <div class="contact-links">
@@ -1078,7 +1316,7 @@
   <footer>
     <span>Rafael Custódio · 2026</span>
     <div class="footer-dot"></div>
-    <span>FP&amp;A · Analytics · Finance Systems</span>
+    <span>Web · Python · Automação · Consultoria</span>
   </footer>
 
   <!-- ═══════════════ SCRIPTS ═══════════════ -->
@@ -1086,9 +1324,6 @@
     /* ══════════════════════════════════════════
        CONTACT FORM → n8n (Webhook or n8n Form)
     ══════════════════════════════════════════ */
-    // Cole aqui:
-    // - Webhook do n8n: https://.../webhook/SEU_ID
-    // - n8n Form:       https://.../form/SEU_ID
     const N8N_ENDPOINT_URL = "https://custodior.app.n8n.cloud/webhook/formulario.custodior";
     const WHATSAPP_NUMBER = "5575983144766";
 
@@ -1134,8 +1369,6 @@
         throw new Error("Endpoint do n8n não configurado.");
       }
 
-      // n8n Forms (/form/...) normalmente esperam dados como "form submit" (urlencoded),
-      // enquanto Webhooks aceitam bem JSON.
       const asForm = isN8nFormUrl(N8N_ENDPOINT_URL);
 
       const res = await fetch(N8N_ENDPOINT_URL, {
@@ -1172,7 +1405,7 @@
 
         try {
           await submitLead(payload);
-          setStatus('Enviado. Vou te chamar no WhatsApp.', 'ok');
+          setStatus('Enviado. Te chamo no WhatsApp ainda hoje.', 'ok');
           leadForm.reset();
           updateWaQuick();
         } catch (err) {
@@ -1185,9 +1418,10 @@
 
     /* ── Typing effect ── */
     const phrases = [
-      "Fechamento mais rápido. Decisão mais clara. Execução com confiança.",
-      "FP&A · Power BI · DAX · SQL · Excel · Automação.",
-      "Dados confiáveis → análise de variância → narrativa executiva."
+      "Sites modernos, rápidos e visíveis. Do Front-end ao Backend.",
+      "Python para automação, APIs e lógica de negócio complexa.",
+      "Problema do cliente → arquitetura → entrega. Com resultado mensurável.",
+      "Web Dev · Python · SEO · Automação · Consultoria Técnica."
     ];
     let phraseIdx = 0, charIdx = 0, deleting = false;
     const typEl = document.getElementById('typing-text');
@@ -1261,7 +1495,41 @@
         card.style.setProperty('--mouse-y', (e.clientY - r.top)  + 'px');
       });
     });
+    /* ── Hero portrait parallax ── */
+    (function () {
+      const wrap = document.getElementById('heroImgWrap');
+      const img  = document.getElementById('heroPortrait');
+      if (!wrap || !img) return;
 
+      let targetX = 0, targetY = 0;
+      let currentX = 0, currentY = 0;
+      let rafId = null;
+
+      function lerp(a, b, t) { return a + (b - a) * t; }
+
+      function animate() {
+        currentX = lerp(currentX, targetX, 0.08);
+        currentY = lerp(currentY, targetY, 0.08);
+        img.style.transform = `translate(${currentX}px, ${currentY}px) scale(1.07)`;
+        rafId = requestAnimationFrame(animate);
+      }
+      animate();
+
+      document.addEventListener('mousemove', (e) => {
+        if (window.innerWidth <= 768) return;
+        const cx = window.innerWidth  / 2;
+        const cy = window.innerHeight / 2;
+        /* Move opposite to cursor for depth illusion */
+        targetX = -((e.clientX - cx) / cx) * 14;
+        targetY = -((e.clientY - cy) / cy) * 10;
+      });
+
+      /* Reset on mouse leave */
+      document.addEventListener('mouseleave', () => {
+        targetX = 0;
+        targetY = 0;
+      });
+    })();
 
   </script>
 </body>
