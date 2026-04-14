@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="favicon.png">
-  
+
   <style>
     /* ══════════════════════════════════════════════════════════
        ROOT & DESIGN TOKENS
@@ -17,7 +17,7 @@
       --bg-dark:        #050505;
       --bg-surface:     #0a0a0a;
       --bg-card:        #0f0f0f;
-      --accent:         #00bfff;
+      --accent:         #00BFFF;
       --accent-dim:     rgba(0, 191, 255, 0.08);
       --accent-mid:     rgba(0, 191, 255, 0.18);
       --accent-bright:  rgba(0, 191, 255, 0.35);
@@ -130,7 +130,7 @@
     }
 
     .hamburger {
-      display: black;
+      display: none;
       flex-direction: column;
       justify-content: center;
       gap: 6px;
@@ -599,6 +599,103 @@
       border-color: var(--accent-border);
       color: var(--accent);
       background: var(--accent-dim);
+    }
+
+    .sim-cta {
+      margin-top: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid var(--accent-border);
+      background: linear-gradient(135deg, rgba(0, 191, 255, 0.25), rgba(0, 191, 255, 0.08));
+      color: var(--text-main);
+      font-family: var(--font-code);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      padding: 10px 14px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: transform 0.2s var(--ease-smooth), box-shadow 0.2s var(--ease-smooth);
+    }
+
+    .sim-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 24px rgba(0, 191, 255, 0.25);
+    }
+
+    .sim-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      display: grid;
+      place-items: center;
+      background: rgba(5, 5, 5, 0.92);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s var(--ease-smooth);
+    }
+
+    .sim-modal.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sim-modal-panel {
+      width: min(96vw, 1320px);
+      height: min(92vh, 860px);
+      border: 1px solid var(--accent-border);
+      background: #0a0a0a;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5), 0 0 32px rgba(0, 191, 255, 0.15);
+      transform: translateY(12px) scale(0.985);
+      transition: transform 0.25s var(--ease-smooth);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+    }
+
+    .sim-modal.open .sim-modal-panel {
+      transform: translateY(0) scale(1);
+    }
+
+    .sim-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-normal);
+      background: rgba(0, 191, 255, 0.03);
+      font-family: var(--font-code);
+      font-size: 0.68rem;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .sim-close {
+      border: 1px solid var(--accent-border);
+      background: transparent;
+      color: var(--text-main);
+      cursor: pointer;
+      width: 28px;
+      height: 28px;
+      border-radius: 2px;
+      font-size: 1rem;
+      line-height: 1;
+      transition: background 0.2s var(--ease-smooth);
+    }
+
+    .sim-close:hover {
+      background: rgba(0, 191, 255, 0.12);
+    }
+
+    .sim-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #000;
     }
 
     /* ══════════════════════════════════════════════════════════
@@ -1093,6 +1190,11 @@
       .contact-form { padding: 32px 24px; }
       .wa-float { bottom: 24px; right: 24px; }
       footer { flex-direction: column; gap: 12px; }
+      .sim-modal-panel {
+        width: 100vw;
+        height: 100vh;
+        border: none;
+      }
     }
 
     @media (max-width: 480px) {
@@ -1111,22 +1213,6 @@
         scroll-behavior: auto !important;
       }
     }
-    .contato-container {
-    display: inline-block; /* Faz a div se ajustar ao tamanho da imagem */
-}
-
-.img-whatsapp {
-    width: 20px; /* Ajuste o tamanho aqui */
-    height: auto;
-    cursor: pointer;
-    transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-/* Efeito de brilho e aumento leve ao passar o mouse */
-.img-whatsapp:hover {
-    transform: scale(1.1);
-    filter: brightness(1.2);
-}
   </style>
 </head>
 <body>
@@ -1159,7 +1245,7 @@
     <div class="hero-content">
       <div class="fade-in">
         <div class="terminal-badge">DEV.INIT() — FEIRA DE SANTANA, BR · DISPONÍVEL</div>
-        <h1>Systems.<br>Finance.<br><span class="accent">&amp; Strategy.</span></h1>
+        <h1>Web.<br>Python.<br><span class="accent">&amp; Soluções.</span></h1>
         <p class="hero-sub"><span id="typing-text"></span><span class="cursor-char"></span></p>
       </div>
       <div class="hero-meta fade-in">
@@ -1194,7 +1280,7 @@
         <div class="op-card-content">
           <div class="op-card-index">01 — WEB DEV</div>
           <div class="op-card-client">FRONT.END</div>
-          <h3>Alicerce DIGITAL</h3>
+          <h3>Desenvolvimento Web</h3>
           <p>Landing pages e sites institucionais de alta conversão. Front-end moderno, responsivo e otimizado para SEO: rápido nos buscadores, preciso nos dispositivos.</p>
           <div class="op-tags">
             <span class="op-tag">HTML/CSS/JS</span>
@@ -1330,8 +1416,42 @@
           </div>
         </div>
       </div>
+
+      <div class="op-card">
+        <div class="op-card-content">
+          <div class="op-card-index">CASE 04 — ELASTICIDADE-PREÇO</div>
+          <div class="op-card-client">ECON.SIMULATOR</div>
+          <h3>Simulador EPD</h3>
+          <p>Ferramenta para avaliar cenários de preço, demanda, margem e lucro em tempo real com base em elasticidade-preço da demanda.</p>
+          <div class="op-tags">
+            <span class="op-tag">Economia</span>
+            <span class="op-tag">Pricing</span>
+            <span class="op-tag">Forecast</span>
+            <span class="op-tag">Análise de Lucro</span>
+          </div>
+          <button class="sim-cta" type="button" onclick="openSimulator()">Testar Simulador</button>
+        </div>
+      </div>
     </div>
   </section>
+
+  <div class="sim-modal" id="simulatorModal" aria-hidden="true">
+    <div class="sim-modal-panel" role="dialog" aria-modal="true" aria-label="Simulador de Elasticidade-Preço">
+      <div class="sim-head">
+        <span>EPD Simulator v2</span>
+        <button class="sim-close" type="button" aria-label="Fechar simulador" onclick="closeSimulator()">×</button>
+      </div>
+      <iframe
+        class="sim-iframe"
+        id="simulatorFrame"
+        src="about:blank"
+        data-src="https://custodior-cc.github.io/simulator_epd/"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        title="Simulador de Elasticidade-Preço da Demanda"
+      ></iframe>
+    </div>
+  </div>
 
   <!-- ═══════════════ COMPETÊNCIAS ═══════════════ -->
   <section id="competencias">
@@ -1383,10 +1503,10 @@
         <p class="skills-col-title">Dados, BI &amp; Negócios</p>
         <div class="skill-row">
           <div class="skill-bar-wrap">
-            <div class="skill-name">Administração</div>
-            <div class="skill-track"><div class="skill-fill" style="--w:89%"></div></div>
+            <div class="skill-name">Python (Pandas / APIs)</div>
+            <div class="skill-track"><div class="skill-fill" style="--w:85%"></div></div>
           </div>
-          <span class="skill-badge">89%</span>
+          <span class="skill-badge">85%</span>
         </div>
         <div class="skill-row">
           <div class="skill-bar-wrap">
@@ -1475,7 +1595,7 @@
   <section id="contato">
     <div class="contact-wrapper">
       <p class="section-eyebrow fade-in">/ Próximo Passo</p>
-      <h2 class="section-title fade-in">Vamos Conversar?</h2>
+      <h2 class="section-title fade-in">Vamos Conversar? <span class="muted">/ Conectar</span></h2>
       <p class="section-desc fade-in">Disponível para projetos ambiciosos, consultoria técnica e parcerias. Respondo em até 24h nos dias úteis — ou direto no WhatsApp para uma conversa mais rápida.</p>
 
       <div class="contact-form fade-in">
@@ -1490,7 +1610,7 @@
           </div>
           <div class="form-row">
             <label class="form-label">Email ou WhatsApp</label>
-            <input type="text" id="fContact" class="form-input" placeholder="seu@email.com ou +55 75 99999-9999">
+            <input type="text" id="fContact" class="form-input" placeholder="seu@email.com ou +55 11 99999-9999">
           </div>
           <div class="form-row">
             <label class="form-label">Assunto</label>
@@ -1518,34 +1638,34 @@
           <div class="c-icon">✉</div>
           <div class="c-content">
             <span class="c-label">Email</span>
-            <span class="c-value">custodior.work@gmail.com</span>
+            <span class="c-value">rafael@custodior.dev</span>
           </div>
           <div class="c-arrow">→</div>
         </a>
 
-        <a href="https://wa.me/5571983143061" target="_blank" rel="noopener" class="contact-link" id="waQuick">
-          <div class="c-icon"><img src="C:\Users\FortLine\Desktop\TECH\custodior\wpp.png" alt="WhatsApp" class="img-whatsapp"></div>
+        <a href="https://wa.me/5575983143061" target="_blank" rel="noopener" class="contact-link" id="waQuick">
+          <div class="c-icon">💬</div>
           <div class="c-content">
             <span class="c-label">WhatsApp</span>
-            <span class="c-value">+55 71 98314-3061</span>
+            <span class="c-value">+55 75 98314-3061</span>
           </div>
           <div class="c-arrow">→</div>
         </a>
 
-        <a href="https://linkedin.com/in/custodior" target="_blank" rel="noopener" class="contact-link">
+        <a href="https://linkedin.com/in/rafaelcustodio" target="_blank" rel="noopener" class="contact-link">
           <div class="c-icon">in</div>
           <div class="c-content">
             <span class="c-label">LinkedIn</span>
-            <span class="c-value">linkedin.com/in/custodior</span>
+            <span class="c-value">linkedin.com/in/rafaelcustodio</span>
           </div>
           <div class="c-arrow">→</div>
         </a>
 
-        <a href="https://github.com/custodior-cc" target="_blank" rel="noopener" class="contact-link">
+        <a href="https://github.com/rafaelcustodio" target="_blank" rel="noopener" class="contact-link">
           <div class="c-icon">gh</div>
           <div class="c-content">
             <span class="c-label">GitHub</span>
-            <span class="c-value">github.com/custodior-cc</span>
+            <span class="c-value">github.com/rafaelcustodio</span>
           </div>
           <div class="c-arrow">→</div>
         </a>
@@ -1554,7 +1674,7 @@
   </section>
 
   <!-- ═══════════════ FLOATING BUTTONS ═══════════════ -->
-  <a class="wa-float" href="https://wa.me/5571983143061" target="_blank" rel="noopener">
+  <a class="wa-float" href="https://wa.me/5575983143061" target="_blank" rel="noopener">
     <span class="wa-dot"></span>
     WhatsApp
   </a>
@@ -1570,7 +1690,7 @@
   <script>
     /* ── Form & n8n Integration ── */
     const N8N_ENDPOINT_URL = "https://custodior.app.n8n.cloud/webhook/formulario.custodior";
-    const WHATSAPP_NUMBER = "5571983143061";
+    const WHATSAPP_NUMBER = "5575983143061";
 
     function buildWhatsAppUrl(text) {
       return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
@@ -1868,6 +1988,52 @@
         captureMobileLayoutMetrics('run2');
       }
     }, { passive: true });
+
+    const simulatorModal = document.getElementById('simulatorModal');
+    const simulatorFrame = document.getElementById('simulatorFrame');
+
+    function openSimulator() {
+      if (!simulatorModal || !simulatorFrame) return;
+      if (simulatorFrame.src === 'about:blank') {
+        simulatorFrame.src = simulatorFrame.dataset.src || 'https://custodior-cc.github.io/simulator_epd/';
+      }
+      simulatorModal.classList.add('open');
+      simulatorModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      // #region agent log
+      fetch('http://127.0.0.1:7637/ingest/7b11c409-1849-43a5-8c3c-d6a64f74a2e6',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'8a45c4'},body:JSON.stringify({sessionId:'8a45c4',runId:'run4',hypothesisId:'H7',location:'rafael-custodio-portfolio-v2.html:simulator:open',message:'Simulator modal opened',data:{iframeSrc:simulatorFrame.src},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+    }
+
+    function closeSimulator() {
+      if (!simulatorModal) return;
+      simulatorModal.classList.remove('open');
+      simulatorModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      // #region agent log
+      fetch('http://127.0.0.1:7637/ingest/7b11c409-1849-43a5-8c3c-d6a64f74a2e6',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'8a45c4'},body:JSON.stringify({sessionId:'8a45c4',runId:'run4',hypothesisId:'H8',location:'rafael-custodio-portfolio-v2.html:simulator:close',message:'Simulator modal closed',data:{closeMode:'manual'},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+    }
+
+    if (simulatorModal) {
+      simulatorModal.addEventListener('click', (event) => {
+        if (event.target === simulatorModal) {
+          closeSimulator();
+          // #region agent log
+          fetch('http://127.0.0.1:7637/ingest/7b11c409-1849-43a5-8c3c-d6a64f74a2e6',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'8a45c4'},body:JSON.stringify({sessionId:'8a45c4',runId:'run4',hypothesisId:'H9',location:'rafael-custodio-portfolio-v2.html:simulator:overlay-close',message:'Simulator closed by overlay click',data:{},timestamp:Date.now()})}).catch(()=>{});
+          // #endregion
+        }
+      });
+    }
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && simulatorModal?.classList.contains('open')) {
+        closeSimulator();
+        // #region agent log
+        fetch('http://127.0.0.1:7637/ingest/7b11c409-1849-43a5-8c3c-d6a64f74a2e6',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'8a45c4'},body:JSON.stringify({sessionId:'8a45c4',runId:'run4',hypothesisId:'H10',location:'rafael-custodio-portfolio-v2.html:simulator:esc-close',message:'Simulator closed by ESC',data:{},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+      }
+    });
   </script>
 </body>
 </html>
