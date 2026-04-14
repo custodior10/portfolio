@@ -600,103 +600,6 @@
       background: var(--accent-dim);
     }
 
-    /* Botão Simulador */
-    .btn-simulator {
-      margin-top: 20px;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: linear-gradient(135deg, var(--accent), rgba(0, 191, 255, 0.7));
-      color: var(--bg-dark);
-      font-family: var(--font-display);
-      font-size: 0.85rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      padding: 14px 28px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s var(--ease-smooth);
-      box-shadow: 0 4px 16px rgba(0, 191, 255, 0.3);
-    }
-
-    .btn-simulator:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 191, 255, 0.5);
-      background: linear-gradient(135deg, rgba(0, 191, 255, 1.1), var(--accent));
-    }
-
-    .btn-icon {
-      font-size: 0.7rem;
-      transition: transform 0.3s var(--ease-smooth);
-    }
-
-    .btn-simulator:hover .btn-icon {
-      transform: translateX(3px);
-    }
-
-    /* Modal Simulador */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.95);
-      backdrop-filter: blur(8px);
-      z-index: 9999;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      animation: fadeIn 0.3s var(--ease-smooth);
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal-container {
-      position: relative;
-      width: 95vw;
-      height: 95vh;
-      max-width: 1600px;
-      background: var(--bg-dark);
-      border: 1px solid var(--accent-border);
-      box-shadow: 0 20px 60px rgba(0, 191, 255, 0.3);
-      animation: scaleIn 0.4s var(--ease-bounce);
-    }
-
-    @keyframes scaleIn {
-      from { transform: scale(0.9); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    .modal-close {
-      position: absolute;
-      top: -40px;
-      right: 0;
-      background: var(--accent);
-      color: var(--bg-dark);
-      border: none;
-      width: 36px;
-      height: 36px;
-      font-size: 1.2rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s var(--ease-smooth);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-close:hover {
-      background: var(--text-main);
-      transform: rotate(90deg);
-    }
-
-    #simulatorFrame {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
     /* ══════════════════════════════════════════════════════════
        SKILLS SECTION
     ══════════════════════════════════════════════════════════ */
@@ -1290,7 +1193,7 @@
         <div class="op-card-content">
           <div class="op-card-index">01 — WEB DEV</div>
           <div class="op-card-client">FRONT.END</div>
-          <h3>Alicerce</h3>
+          <h3>Alicerce DIGITAL</h3>
           <p>Landing pages e sites institucionais de alta conversão. Front-end moderno, responsivo e otimizado para SEO: rápido nos buscadores, preciso nos dispositivos.</p>
           <div class="op-tags">
             <span class="op-tag">HTML/CSS/JS</span>
@@ -1426,35 +1329,8 @@
           </div>
         </div>
       </div>
-
-      <div class="op-card op-card-interactive">
-        <div class="op-card-content">
-          <div class="op-card-index">CASE 04 — SIMULADOR WEB</div>
-          <div class="op-card-client">INTERACTIVE.TOOL</div>
-          <h3>Simulador de Elasticidade-Preço</h3>
-          <p>Ferramenta interativa para análise de precificação com elasticidade da demanda, otimização de lucro, gestão de estoque e visualização de cenários em tempo real.</p>
-          <div class="op-tags">
-            <span class="op-tag">HTML/CSS/JS</span>
-            <span class="op-tag">Chart.js</span>
-            <span class="op-tag">Economia</span>
-            <span class="op-tag">UX/UI</span>
-          </div>
-          <button class="btn-simulator" onclick="openSimulator()">
-            <span class="btn-icon">▶</span>
-            <span>Testar Simulador</span>
-          </button>
-        </div>
-      </div>
     </div>
   </section>
-
-  <!-- Modal Simulador -->
-  <div id="simulatorModal" class="modal-overlay">
-    <div class="modal-container">
-      <button class="modal-close" onclick="closeSimulator()">✕</button>
-      <iframe id="simulatorFrame" src=""></iframe>
-    </div>
-  </div>
 
   <!-- ═══════════════ COMPETÊNCIAS ═══════════════ -->
   <section id="competencias">
@@ -1637,11 +1513,11 @@
       </div>
 
       <div class="contact-links fade-in">
-        <a href="/cdn-cgi/l/email-protection#2557444344404965465056514a414c4a570b414053" class="contact-link">
+        <a href="mailto:rafael@custodior.dev" class="contact-link">
           <div class="c-icon">✉</div>
           <div class="c-content">
             <span class="c-label">Email</span>
-            <span class="c-value"><span class="__cf_email__" data-cfemail="b8dbcdcbccd7dcd1d7ca96cfd7cad3f8dfd5d9d1d496dbd7d5">[email&#160;protected]</span></span>
+            <span class="c-value">custodior.work@gmail.com</span>
           </div>
           <div class="c-arrow">→</div>
         </a>
@@ -1690,7 +1566,7 @@
   </footer>
 
   <!-- ═══════════════ SCRIPTS ═══════════════ -->
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script>
     /* ── Form & n8n Integration ── */
     const N8N_ENDPOINT_URL = "https://custodior.app.n8n.cloud/webhook/formulario.custodior";
     const WHATSAPP_NUMBER = "5571983143061";
@@ -1899,33 +1775,6 @@
       });
     });
 
-    /* ── Simulador Modal Control ── */
-    function openSimulator() {
-      const modal = document.getElementById('simulatorModal');
-      const iframe = document.getElementById('simulatorFrame');
-      iframe.src = 'EPD_Simulator.html';
-      modal.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeSimulator() {
-      const modal = document.getElementById('simulatorModal');
-      const iframe = document.getElementById('simulatorFrame');
-      modal.classList.remove('active');
-      iframe.src = '';
-      document.body.style.overflow = '';
-    }
-
-    // Fechar modal ao clicar fora
-    document.getElementById('simulatorModal')?.addEventListener('click', function(e) {
-      if (e.target === this) closeSimulator();
-    });
-
-    // Fechar modal com ESC
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeSimulator();
-    });
-
     /* ── Hero Portrait Parallax ── */
     (function () {
       const wrap = document.getElementById('heroImgWrap');
@@ -2009,4 +1858,15 @@
     window.addEventListener('load', () => {
       if (window.innerWidth <= 768) {
         captureMobileLayoutMetrics('run2');
-        captureMobileActiveSectio
+        captureMobileActiveSection('run2');
+      }
+    }, { passive: true });
+
+    window.addEventListener('orientationchange', () => {
+      if (window.innerWidth <= 768) {
+        captureMobileLayoutMetrics('run2');
+      }
+    }, { passive: true });
+  </script>
+</body>
+</html>
