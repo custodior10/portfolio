@@ -1213,6 +1213,22 @@
         scroll-behavior: auto !important;
       }
     }
+    .contato-container {
+    display: inline-block; /* Faz a div se ajustar ao tamanho da imagem */
+}
+
+.img-whatsapp {
+    width: 20px; /* Ajuste o tamanho aqui */
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+/* Efeito de brilho e aumento leve ao passar o mouse */
+.img-whatsapp:hover {
+    transform: scale(1.1);
+    filter: brightness(1.2);
+}
   </style>
 </head>
 <body>
@@ -1610,7 +1626,7 @@
           </div>
           <div class="form-row">
             <label class="form-label">Email ou WhatsApp</label>
-            <input type="text" id="fContact" class="form-input" placeholder="seu@email.com ou +55 11 99999-9999">
+            <input type="text" id="fContact" class="form-input" placeholder="seu@email.com ou +55 75 99999-9999">
           </div>
           <div class="form-row">
             <label class="form-label">Assunto</label>
@@ -1638,34 +1654,34 @@
           <div class="c-icon">✉</div>
           <div class="c-content">
             <span class="c-label">Email</span>
-            <span class="c-value">rafael@custodior.dev</span>
+            <span class="c-value">custodior.work@gmail.com</span>
           </div>
           <div class="c-arrow">→</div>
         </a>
 
-        <a href="https://wa.me/5575983143061" target="_blank" rel="noopener" class="contact-link" id="waQuick">
-          <div class="c-icon">💬</div>
+        <a href="https://wa.me/5571983143061" target="_blank" rel="noopener" class="contact-link" id="waQuick">
+          <div class="c-icon"><img src="C:\Users\FortLine\Desktop\TECH\custodior\wpp.png" alt="WhatsApp" class="img-whatsapp"></div>
           <div class="c-content">
             <span class="c-label">WhatsApp</span>
-            <span class="c-value">+55 75 98314-3061</span>
+            <span class="c-value">+55 71 98314-3061</span>
           </div>
           <div class="c-arrow">→</div>
         </a>
 
-        <a href="https://linkedin.com/in/rafaelcustodio" target="_blank" rel="noopener" class="contact-link">
+        <a href="https://linkedin.com/in/custodior" target="_blank" rel="noopener" class="contact-link">
           <div class="c-icon">in</div>
           <div class="c-content">
             <span class="c-label">LinkedIn</span>
-            <span class="c-value">linkedin.com/in/rafaelcustodio</span>
+            <span class="c-value">linkedin.com/in/custodior</span>
           </div>
           <div class="c-arrow">→</div>
         </a>
 
-        <a href="https://github.com/rafaelcustodio" target="_blank" rel="noopener" class="contact-link">
+        <a href="https://github.com/custodior-cc" target="_blank" rel="noopener" class="contact-link">
           <div class="c-icon">gh</div>
           <div class="c-content">
             <span class="c-label">GitHub</span>
-            <span class="c-value">github.com/rafaelcustodio</span>
+            <span class="c-value">github.com/custodior-cc</span>
           </div>
           <div class="c-arrow">→</div>
         </a>
@@ -1674,7 +1690,7 @@
   </section>
 
   <!-- ═══════════════ FLOATING BUTTONS ═══════════════ -->
-  <a class="wa-float" href="https://wa.me/5575983143061" target="_blank" rel="noopener">
+  <a class="wa-float" href="https://wa.me/5571983143061" target="_blank" rel="noopener">
     <span class="wa-dot"></span>
     WhatsApp
   </a>
@@ -1690,7 +1706,7 @@
   <script>
     /* ── Form & n8n Integration ── */
     const N8N_ENDPOINT_URL = "https://custodior.app.n8n.cloud/webhook/formulario.custodior";
-    const WHATSAPP_NUMBER = "5575983143061";
+    const WHATSAPP_NUMBER = "5571983143061";
 
     function buildWhatsAppUrl(text) {
       return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
