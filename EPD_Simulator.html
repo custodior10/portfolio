@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EPD Simulator v2 · Custódio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg:       #060708;
+      --surf:     #0b0d11;
+      --surf2:    #10141a;
+      --accent:   #004cff;
+      --acc-a:    rgba(0,76,255,.09);
+      --acc-b:    rgba(0,76,255,.28);
+      --green:    #00e676;
+      --grn-a:    rgba(0,230,118,.08);
+      --red:      #ff1744;
+      --red-a:    rgba(255,23,68,.08);
+      --amber:    #ffab00;
+      --amb-a:    rgba(255,171,0,.08);
+      --txt:      #d4d9e2;
+      --txt2:     #606878;
+      --txt3:     #282f3a;
+      --bdr:      #13171e;
+      --bdr2:     #1c2230;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      background: var(--bg);
+      color: var(--txt);
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ─────────────────────────────────── */
+    .hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 28px;
+      border-bottom: 1px solid var(--bdr);
+      background: rgba(6,7,8,.97);
+      backdrop-filter: blur(16px);
+      position: sticky; top: 0; z-index: 99;
+      gap: 16px;
+    }
+    .hdr-brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .pulse {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+      animation: pulseAnim 2.5s ease-in-out infinite;
+    }
+    @keyframes pulseAnim {
+      0%,100% { box-shadow: 0 0 5px var(--accent); }
+      50%      { box-shadow: 0 0 16px var(--accent), 0 0 32px rgba(0,76,255,.35); }
+    }
+    .hdr-title { font-family:'Syne',sans-serif; font-weight:800; font-size:.95rem; letter-spacing:.2px; }
+    .hdr-title em { color: var(--accent); font-style: normal; }
+    .hdr-sub { font-size:.55rem; color:var(--txt3); letter-spacing:2.5px; text-transform:uppercase; margin-top:2px; }
+    .hdr-live {
+      display: flex; align-items: center; gap: 12px; font-size:.68rem;
+      background: var(--surf); border: 1px solid var(--bdr2);
+      padding: 7px 16px; border-radius: 4px;
+    }
+    .hdr-sep { width:1px; height:14px; background:var(--bdr2); }
+    .hdr-live-lbl { color: var(--txt3); }
+    .hdr-badge {
+      font-size:.55rem; letter-spacing:2px; text-transform:uppercase;
+      color:var(--txt2); border:1px solid var(--bdr2);
+      padding:5px 11px; border-radius:3px; flex-shrink:0;
+    }
+    .hdr-badge em { color:var(--accent); font-style:normal; }
+
+    /* ── LAYOUT ──────────────────────────────────── */
+    .wrap { display: grid; grid-template-columns: 282px 1fr; min-height: calc(100vh - 51px); }
+
+    /* ── SIDEBAR ──────────────────────────────────── */
+    .sbar {
+      border-right: 1px solid var(--bdr);
+      padding: 18px 16px;
+      display: flex; flex-direction: column; gap: 5px;
+      overflow-y: auto;
+    }
+    .sbar::-webkit-scrollbar { width: 3px; }
+    .sbar::-webkit-scrollbar-thumb { background: var(--bdr2); border-radius:2px; }
+    .sec-lbl {
+      font-family:'Syne',sans-serif; font-weight:700; font-size:.52rem;
+      letter-spacing:3px; text-transform:uppercase; color:var(--txt3);
+      padding: 9px 0 5px; border-bottom: 1px solid var(--bdr); margin-bottom: 3px;
+    }
+    .ig { display:flex; flex-direction:column; gap:5px; margin-bottom:3px; }
+    .ig-lbl { font-size:.56rem; color:var(--txt3); letter-spacing:1.5px; text-transform:uppercase; }
+    .irow {
+      display:flex; align-items:center; gap:7px;
+      background: var(--surf); border:1px solid var(--bdr);
+      border-radius:4px; padding:8px 10px; transition:border-color .2s;
+    }
+    .irow:focus-within { border-color: var(--acc-b); box-shadow: 0 0 0 3px rgba(0,76,255,.07); }
+    .ipfx { font-size:.65rem; color:var(--txt3); flex-shrink:0; }
+    input[type=number] {
+      background:none; border:none; outline:none; color:var(--txt);
+      font-family:'JetBrains Mono',monospace; font-size:.86rem; font-weight:500; width:100%;
+    }
+    input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; }
+
+    /* ed badge */
+    .ed-badge {
+      display:flex; align-items:center; gap:8px;
+      padding: 8px 10px; border-radius:4px; border:1px solid;
+      font-size:.6rem; letter-spacing:1px; text-transform:uppercase; font-weight:600;
+      transition: all .3s; margin-top:1px;
+    }
+    .ed-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; transition:all .3s; }
+
+    /* slider */
+    .sl-wrap {
+      background: var(--acc-a); border:1px solid var(--acc-b);
+      border-radius:6px; padding:14px; margin:5px 0;
+    }
+    .sl-top { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:13px; }
+    .sl-lbl { font-family:'Syne',sans-serif; font-weight:700; font-size:.56rem; color:var(--accent); letter-spacing:2px; text-transform:uppercase; }
+    .sl-val { font-size:1.65rem; font-weight:700; color:var(--accent); line-height:1; text-align:right; }
+    .sl-delta { font-size:.56rem; text-align:right; margin-top:3px; min-height:13px; }
+    input[type=range] {
+      -webkit-appearance:none; width:100%; height:3px;
+      background: linear-gradient(to right, var(--accent) var(--pct,50%), var(--bdr2) var(--pct,50%));
+      border-radius:2px; outline:none; cursor:pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+      background:var(--accent); border:2px solid var(--bg);
+      box-shadow:0 0 0 1px var(--accent); cursor:pointer;
+      transition:transform .1s, box-shadow .1s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform:scale(1.3);
+      box-shadow:0 0 0 1px var(--accent), 0 0 10px rgba(0,76,255,.7);
+    }
+    .sl-range { display:flex; justify-content:space-between; margin-top:6px; }
+    .sl-range span { font-size:.56rem; color:var(--txt3); }
+
+    /* optimal box */
+    .opt-box {
+      background:var(--surf); border:1px solid var(--bdr);
+      border-radius:4px; padding:11px; font-size:.6rem; line-height:1.7;
+    }
+    .opt-box .lbl {
+      font-family:'Syne',sans-serif; font-weight:700; font-size:.52rem;
+      letter-spacing:2px; text-transform:uppercase; color:var(--txt3); margin-bottom:7px;
+    }
+
+    /* stock section */
+    .stk-box {
+      background:var(--surf); border:1px solid var(--bdr);
+      border-radius:4px; padding:11px; margin-top:1px;
+    }
+    .stk-bar-wrap {
+      background:var(--bdr2); border-radius:2px; height:5px; margin:9px 0 5px; overflow:hidden;
+    }
+    .stk-bar-fill {
+      height:100%; border-radius:2px; transition: width .25s, background .25s;
+    }
+    .stk-row { display:flex; justify-content:space-between; font-size:.58rem; color:var(--txt3); }
+    .stk-warn {
+      display:none; align-items:center; gap:6px;
+      padding:7px 9px; border-radius:3px; font-size:.59rem; font-weight:600;
+      letter-spacing:.5px; margin-top:6px;
+      background:rgba(255,23,68,.07); border:1px solid rgba(255,23,68,.22); color:var(--red);
+    }
+    .stk-ok {
+      display:none; align-items:center; gap:6px;
+      padding:7px 9px; border-radius:3px; font-size:.59rem; font-weight:600;
+      letter-spacing:.5px; margin-top:6px;
+      background:rgba(0,230,118,.06); border:1px solid rgba(0,230,118,.2); color:var(--green);
+    }
+
+    /* buttons / scenarios */
+    .btn {
+      background:var(--surf); border:1px solid var(--bdr2); color:var(--txt2);
+      font-family:'JetBrains Mono',monospace; font-size:.58rem; letter-spacing:1px;
+      text-transform:uppercase; padding:8px 10px; border-radius:3px; cursor:pointer; transition:all .15s;
+      width:100%;
+    }
+    .btn:hover { border-color:var(--acc-b); color:var(--accent); }
+    .sc-list { display:flex; flex-direction:column; gap:4px; }
+    .sc-empty { font-size:.58rem; color:var(--txt3); text-align:center; padding:12px 0; }
+    .sc-item {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:7px 9px; background:var(--surf); border:1px solid var(--bdr);
+      border-radius:3px; font-size:.6rem; cursor:pointer; transition:border-color .2s;
+    }
+    .sc-item:hover { border-color:var(--acc-b); }
+
+    /* ── MAIN CONTENT ──────────────────────────────── */
+    .cnt { display:flex; flex-direction:column; }
+
+    /* formula bar */
+    .fbar {
+      display:flex; gap:0; overflow-x:auto; flex-wrap:nowrap;
+      border-bottom:1px solid var(--bdr); background:var(--surf);
+    }
+    .fbar::-webkit-scrollbar { height:2px; }
+    .fi {
+      display:flex; align-items:center; gap:7px;
+      padding:9px 18px; border-right:1px solid var(--bdr);
+      font-size:.58rem; white-space:nowrap; flex-shrink:0;
+    }
+    .fi:last-child { border-right:none; }
+    .fi-lbl { color:var(--txt3); }
+    .fi-expr { color:var(--accent); background:var(--acc-a); padding:2px 8px; border-radius:3px; }
+
+    /* charts row */
+    .charts { display:grid; grid-template-columns:1fr 1fr; border-bottom:1px solid var(--bdr); }
+    .cp { padding:20px 22px; }
+    .cp:first-child { border-right:1px solid var(--bdr); }
+    .cp-hdr { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+    .cp-title { font-family:'Syne',sans-serif; font-weight:700; font-size:.72rem; letter-spacing:.8px; text-transform:uppercase; }
+    .cp-sub { font-size:.56rem; color:var(--txt3); margin-top:3px; }
+    .cp-tag {
+      font-size:.52rem; letter-spacing:1.5px; text-transform:uppercase;
+      padding:3px 8px; border-radius:2px; border:1px solid; transition:all .3s; flex-shrink:0;
+    }
+
+    /* kpi grid */
+    .krow { display:grid; grid-template-columns:repeat(4,1fr); border-bottom:1px solid var(--bdr); }
+    .kbox { padding:16px 20px; border-right:1px solid var(--bdr); transition:background .2s; }
+    .kbox:last-child { border-right:none; }
+    .kbox:hover { background:var(--surf); }
+    .k-lbl { font-size:.52rem; letter-spacing:1.8px; text-transform:uppercase; color:var(--txt3); margin-bottom:9px; }
+    .k-val { font-size:1.15rem; font-weight:700; line-height:1; transition:color .25s; }
+    .k-sub { font-size:.57rem; color:var(--txt3); margin-top:5px; }
+
+    /* interpretation */
+    .interp { display:grid; grid-template-columns:1fr 1fr; border-top:1px solid var(--bdr); }
+    .ip { padding:16px 22px; }
+    .ip:first-child { border-right:1px solid var(--bdr); }
+    .ip-lbl {
+      font-family:'Syne',sans-serif; font-weight:700; font-size:.52rem;
+      letter-spacing:2.5px; text-transform:uppercase; color:var(--txt3); margin-bottom:9px;
+    }
+    .ip-txt { font-size:.67rem; line-height:1.8; color:var(--txt2); }
+    .ip-txt strong { color:var(--txt); font-weight:600; }
+    .g  { color: var(--green);  }
+    .r  { color: var(--red);    }
+    .am { color: var(--amber);  }
+    .ac { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ──────────────────────────────────────── -->
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="pulse"></div>
+    <div>
+      <div class="hdr-title">EPD <em>Simulator</em></div>
+      <div class="hdr-sub">Elasticidade-Preço da Demanda</div>
+    </div>
+  </div>
+
+  <div class="hdr-live">
+    <span class="hdr-live-lbl">π₁</span>
+    <span id="hRt1" style="color:var(--txt2)">—</span>
+    <div class="hdr-sep"></div>
+    <span class="hdr-live-lbl">π₂</span>
+    <span id="hRt2" style="color:var(--txt2)">—</span>
+    <div class="hdr-sep"></div>
+    <span class="hdr-live-lbl">Δπ</span>
+    <span id="hDrt" style="color:var(--txt2)">—</span>
+    <div class="hdr-sep"></div>
+    <span class="hdr-live-lbl">Margem</span>
+    <span id="hMargin" style="color:var(--txt2)">—</span>
+  </div>
+
+  <div class="hdr-badge">Custódio <em>·</em> ADM + Code</div>
+</header>
+
+<!-- ── MAIN WRAP ────────────────────────────────────── -->
+<div class="wrap">
+
+  <!-- ── SIDEBAR ──────────────────────────────────── -->
+  <aside class="sbar">
+    <div class="sec-lbl">Parâmetros de Entrada</div>
+
+    <div class="ig">
+      <div class="ig-lbl">Preço Atual — P₁ (R$)</div>
+      <div class="irow">
+        <span class="ipfx">R$</span>
+        <input type="number" id="iP1" value="100" step="1" oninput="onP1Change()">
+      </div>
+    </div>
+
+    <div class="ig">
+      <div class="ig-lbl">Demanda Atual — Q₁ (un)</div>
+      <div class="irow">
+        <span class="ipfx">un</span>
+        <input type="number" id="iQ1" value="500" step="10" oninput="calculate()">
+      </div>
+    </div>
+
+    <div class="ig">
+      <div class="ig-lbl">Custo Unitário — CMV (R$) <span style="color:var(--txt3);font-size:.5rem">opcional</span></div>
+      <div class="irow" id="cmvRow">
+        <span class="ipfx">R$</span>
+        <input type="number" id="iCmv" value="" placeholder="sem custo" step="1" oninput="calculate()">
+      </div>
+      <div id="cmvBadge" style="display:none;margin-top:4px;font-size:.58rem;line-height:1.6;color:var(--txt2)"></div>
+    </div>
+
+    <div class="ig">
+      <div class="ig-lbl">Estoque Disponível — S (un) <span style="color:var(--txt3);font-size:.5rem">opcional</span></div>
+      <div class="irow" id="stkRow">
+        <span class="ipfx">un</span>
+        <input type="number" id="iStock" value="" placeholder="sem restrição" step="10" oninput="calculate()">
+      </div>
+    </div>
+
+    <div class="ig">
+      <div class="ig-lbl">Coef. de Elasticidade — Ed</div>
+      <div class="irow">
+        <input type="number" id="iEd" value="-1.5" step="0.1" oninput="calculate()">
+      </div>
+      <div id="edBadge" class="ed-badge" style="color:var(--accent);background:var(--acc-a);border-color:var(--acc-b)">
+        <div id="edDot" class="ed-dot" style="background:var(--accent)"></div>
+        <span id="edTxt">Demanda Elástica  |Ed| > 1</span>
+      </div>
+    </div>
+
+    <!-- SLIDER -->
+    <div class="sl-wrap">
+      <div class="sl-top">
+        <div>
+          <div class="sl-lbl">↔ Simular Novo Preço P₂</div>
+        </div>
+        <div>
+          <div class="sl-val" id="slDisplay">R$ 100</div>
+          <div class="sl-delta" id="slDelta" style="color:var(--txt3)">= sem alteração</div>
+        </div>
+      </div>
+      <input type="range" id="iSlider" min="35" max="165" value="100" step="0.5" oninput="calculate()">
+      <div class="sl-range">
+        <span id="slMin">R$ 35</span>
+        <span id="slMax">R$ 165</span>
+      </div>
+    </div>
+
+    <!-- OPTIMAL ANALYSIS -->
+    <div class="opt-box">
+      <div class="lbl">Análise de Ponto Ótimo de Lucro</div>
+      <div id="optText" style="color:var(--txt2)">—</div>
+    </div>
+
+    <!-- STOCK ANALYSIS -->
+    <div class="stk-box">
+      <div class="lbl" style="font-family:'Syne',sans-serif;font-weight:700;font-size:.52rem;letter-spacing:2px;text-transform:uppercase;color:var(--txt3);margin-bottom:4px">Estoque vs Demanda Projetada</div>
+      <div class="stk-bar-wrap"><div class="stk-bar-fill" id="stkBarFill" style="width:0%;background:var(--accent)"></div></div>
+      <div class="stk-row">
+        <span>Q₂: <span id="stkQ2val" style="color:var(--txt2)">—</span></span>
+        <span>S: <span id="stkSval" style="color:var(--txt2)">—</span></span>
+      </div>
+      <div id="stkWarn" class="stk-warn">⚠ Estoque insuficiente — ruptura projetada</div>
+      <div id="stkOk"   class="stk-ok" >✓ Estoque cobre a demanda projetada</div>
+      <div id="stkOptBlock" style="margin-top:8px;font-size:.59rem;color:var(--txt2);line-height:1.75;display:none"></div>
+    </div>
+
+    <!-- SCENARIOS -->
+    <div class="sec-lbl" style="margin-top:6px">Cenários Salvos</div>
+    <button class="btn" onclick="saveScenario()">+ Salvar Cenário Atual</button>
+    <div class="sc-list" id="scList">
+      <div class="sc-empty">Nenhum cenário salvo ainda.</div>
+    </div>
+  </aside>
+
+  <!-- ── CONTENT ──────────────────────────────────── -->
+  <main class="cnt">
+
+    <!-- FORMULA BAR -->
+    <div class="fbar">
+      <div class="fi">
+        <span class="fi-lbl">Modelo:</span>
+        <span class="fi-expr">Q₂ = Q₁ × (P₂/P₁)^Ed</span>
+      </div>
+      <div class="fi">
+        <span class="fi-lbl">Lucro:</span>
+        <span class="fi-expr">π = (P − c) × Q</span>
+      </div>
+      <div class="fi">
+        <span class="fi-lbl">Rec. Total:</span>
+        <span class="fi-expr">RT = P × Q</span>
+      </div>
+      <div class="fi">
+        <span class="fi-lbl">P* Lucro:</span>
+        <span class="fi-expr">P* = c × Ed ÷ (Ed + 1)</span>
+      </div>
+      <div class="fi">
+        <span class="fi-lbl">Margem:</span>
+        <span class="fi-expr">m = (P − c) ÷ P</span>
+      </div>
+      <div class="fi">
+        <span class="fi-lbl">Lerner:</span>
+        <span class="fi-expr">L = −1 ÷ Ed</span>
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts">
+      <div class="cp">
+        <div class="cp-hdr">
+          <div>
+            <div class="cp-title">Curva de Demanda</div>
+            <div class="cp-sub">Q = f(P) — Elasticidade Constante</div>
+          </div>
+          <div class="cp-tag" id="demTag" style="color:var(--accent);border-color:var(--acc-b)">Q × P</div>
+        </div>
+        <canvas id="cDemand" height="185"></canvas>
+      </div>
+      <div class="cp">
+        <div class="cp-hdr">
+          <div>
+            <div class="cp-title" id="chart2Title">Curva de Lucro</div>
+            <div class="cp-sub" id="chart2Sub">π = (P − c) × Q — Maximização de Lucro</div>
+          </div>
+          <div class="cp-tag" id="revTag" style="color:var(--txt3);border-color:var(--bdr2)">π</div>
+        </div>
+        <canvas id="cRevenue" height="185"></canvas>
+      </div>
+    </div>
+
+    <!-- KPI ROW 1 — LUCRO -->
+    <div class="krow">
+      <div class="kbox">
+        <div class="k-lbl">Lucro Atual — π₁</div>
+        <div class="k-val" id="kLucro1" style="color:var(--txt)">—</div>
+        <div class="k-sub" id="kLucro1Sub">(P₁ − c) × Q₁</div>
+      </div>
+      <div class="kbox">
+        <div class="k-lbl">Lucro Projetado — π₂</div>
+        <div class="k-val" id="kLucro2">—</div>
+        <div class="k-sub" id="kLucro2Sub">(P₂ − c) × Q₂</div>
+      </div>
+      <div class="kbox">
+        <div class="k-lbl">Impacto no Lucro — Δπ</div>
+        <div class="k-val" id="kDlucro">—</div>
+        <div class="k-sub" id="kDlucroPct">Variação relativa</div>
+      </div>
+      <div class="kbox">
+        <div class="k-lbl">Margem de Lucro — m%</div>
+        <div class="k-val" id="kMargem">—</div>
+        <div class="k-sub" id="kMargemSub">(P₂ − c) ÷ P₂</div>
+      </div>
+    </div>
+
+    <!-- KPI ROW 2 — RECEITA + CUSTO -->
+    <div class="krow" style="border-bottom:none">
+      <div class="kbox">
+        <div class="k-lbl">Receita Projetada — RT₂</div>
+        <div class="k-val" id="kRt2" style="color:var(--txt2)">—</div>
+        <div class="k-sub" id="kRt2Sub">P₂ × Q₂</div>
+      </div>
+      <div class="kbox">
+        <div class="k-lbl">CMV Total Projetado</div>
+        <div class="k-val" id="kCmvTotal" style="color:var(--red)">—</div>
+        <div class="k-sub" id="kCmvTotalSub">c × Q₂</div>
+      </div>
+      <div class="kbox">
+        <div class="k-lbl">Nova Demanda — Q₂</div>
+        <div class="k-val" id="kQ2">—</div>
+        <div class="k-sub" id="kQ2Sub">Unidades projetadas</div>
+      </div>
+      <div class="kbox">
+        <div class="k-lbl">Índice de Lerner — L</div>
+        <div class="k-val" id="kLerner">—</div>
+        <div class="k-sub">Poder de mercado = −1/Ed</div>
+      </div>
+    </div>
+
+    <!-- KPI ROW 3 — DETALHES -->
+    <div class="krow" style="border-top:1px solid var(--bdr);border-bottom:none">
+      <div class="kbox">
+        <div class="k-lbl">Variação do Preço — ΔP%</div>
+        <div class="k-val" id="kDp">—</div>
+        <div class="k-sub">Abs: <span id="kDpAbs">—</span></div>
+      </div>
+      <div class="kbox">
+        <div class="k-lbl">Variação da Demanda — ΔQ%</div>
+        <div class="k-val" id="kDq">—</div>
+        <div class="k-sub">Abs: <span id="kDqAbs">—</span></div>
+      </div>
+      <div class="kbox">
+        <div class="k-lbl">Receita Marginal — RMg</div>
+        <div class="k-val" id="kRmg">—</div>
+        <div class="k-sub">P₂ × (1 + 1/Ed)</div>
+      </div>
+      <div class="kbox">
+        <div class="k-lbl">Excedente Consumidor — ΔCS</div>
+        <div class="k-val" id="kCs">—</div>
+        <div class="k-sub">Estimativa trapezoidal</div>
+      </div>
+    </div>
+
+    <!-- KPI ROW STOCK -->
+    <div class="krow" id="kRowStock" style="border-top:1px solid var(--bdr);border-bottom:none;display:none">
+      <div class="kbox">
+        <div class="k-lbl">Estoque Disponível — S</div>
+        <div class="k-val" id="kStock" style="color:var(--txt)">—</div>
+        <div class="k-sub">Unidades em estoque</div>
+      </div>
+      <div class="kbox">
+        <div class="k-lbl">Demanda vs Estoque — Gap</div>
+        <div class="k-val" id="kGap">—</div>
+        <div class="k-sub" id="kGapSub">Vendas perdidas</div>
+      </div>
+      <div class="kbox">
+        <div class="k-lbl">Lucro Realizável c/ Estoque</div>
+        <div class="k-val" id="kRtReal">—</div>
+        <div class="k-sub" id="kRtRealSub">Com cap de estoque</div>
+      </div>
+      <div class="kbox">
+        <div class="k-lbl">P* c/ Restrição de Estoque</div>
+        <div class="k-val" id="kPopt" style="color:var(--amber)">—</div>
+        <div class="k-sub" id="kPoptSub">P que zera estoque sem ruptura</div>
+      </div>
+    </div>
+
+    <!-- INTERPRETATION -->
+    <div class="interp">
+      <div class="ip">
+        <div class="ip-lbl">Interpretação Econômica</div>
+        <div class="ip-txt" id="interpTxt">Ajuste os parâmetros para visualizar a análise econômica automática.</div>
+      </div>
+      <div class="ip">
+        <div class="ip-lbl">Recomendação Estratégica</div>
+        <div class="ip-txt" id="stratTxt">Mova o slider P₂ para receber uma recomendação estratégica baseada nos parâmetros.</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+'use strict';
+
+// ── HELPERS ───────────────────────────────────────────
+const $   = id => document.getElementById(id);
+const clr = v  => v > 0 ? 'var(--green)' : v < 0 ? 'var(--red)' : 'var(--txt2)';
+
+function fmtS(v) {
+  const a = Math.abs(v);
+  if (a >= 1e6) return (v < 0 ? '-' : '') + 'R$' + (a / 1e6).toFixed(2) + 'M';
+  if (a >= 1e3) return (v < 0 ? '-' : '') + 'R$' + (a / 1e3).toFixed(1) + 'k';
+  return 'R$ ' + v.toFixed(2);
+}
+function pfx(v)       { return (v >= 0 ? '+' : '') + fmtS(v); }
+function pctStr(v, d) { d = d === undefined ? 1 : d; return (v >= 0 ? '+' : '') + (v * 100).toFixed(d) + '%'; }
+
+// ── CHART INIT ────────────────────────────────────────
+function makeScale(label) {
+  return {
+    type: 'linear',
+    grid:   { color: 'rgba(255,255,255,0.03)', drawBorder: false },
+    ticks:  { color: '#282f3a', font: { family: "'JetBrains Mono'", size: 10 }, maxTicksLimit: 6 },
+    border: { color: '#13171e' },
+    title:  { display: true, text: label, color: '#282f3a', font: { family: "'JetBrains Mono'", size: 9 }, padding: { top: 4 } }
+  };
+}
+
+const baseOpts = {
+  responsive: true,
+  maintainAspectRatio: true,
+  animation: { duration: 80 },
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      backgroundColor: '#0b0d11', borderColor: '#1c2230', borderWidth: 1,
+      titleColor: '#d4d9e2', bodyColor: '#606878',
+      titleFont: { family: "'JetBrains Mono'", size: 11 },
+      bodyFont:  { family: "'JetBrains Mono'", size: 10 },
+      callbacks: {
+        title: items => 'P = R$ ' + (+items[0].parsed.x).toFixed(2),
+        label: item  => ' ' + item.dataset.label + ': ' + (+item.parsed.y).toFixed(2)
+      }
+    }
+  }
+};
+
+const dCtx = $('cDemand').getContext('2d');
+const rCtx = $('cRevenue').getContext('2d');
+
+const dChart = new Chart(dCtx, {
+  type: 'line',
+  data: {
+    datasets: [
+      { label: 'Q(P)', data: [], borderColor: '#004cff', borderWidth: 2,
+        backgroundColor: 'rgba(0,76,255,0.06)', fill: true, tension: 0.35, pointRadius: 0 },
+      { label: 'P₁ (atual)',  data: [], borderWidth: 0, pointRadius: 7, pointHoverRadius: 9,
+        backgroundColor: 'rgba(255,255,255,0.82)', showLine: false },
+      { label: 'P₂ (projetado)', data: [], borderWidth: 0, pointRadius: 7, pointHoverRadius: 9,
+        backgroundColor: '#00e676', showLine: false }
+    ]
+  },
+  options: { ...baseOpts, scales: { x: makeScale('Preço P (R$)'), y: makeScale('Quantidade Q (un)') } }
+});
+
+const yRevScale = {
+  ...makeScale('Receita Total RT (R$)'),
+  ticks: {
+    color: '#282f3a', font: { family: "'JetBrains Mono'", size: 10 }, maxTicksLimit: 6,
+    callback: v => Math.abs(v) >= 1e6 ? 'R$'+(v/1e6).toFixed(1)+'M'
+                 : Math.abs(v) >= 1e3 ? 'R$'+(v/1e3).toFixed(0)+'k'
+                 : 'R$'+v.toFixed(0)
+  }
+};
+
+const rChart = new Chart(rCtx, {
+  type: 'line',
+  data: {
+    datasets: [
+      { label: 'RT(P)', data: [], borderColor: '#606878', borderWidth: 2,
+        backgroundColor: 'rgba(96,104,120,0.04)', fill: true, tension: 0.35, pointRadius: 0 },
+      { label: 'RT₁', data: [], borderWidth: 0, pointRadius: 7, pointHoverRadius: 9,
+        backgroundColor: 'rgba(255,255,255,0.8)', showLine: false },
+      { label: 'RT₂', data: [], borderWidth: 0, pointRadius: 7, pointHoverRadius: 9,
+        backgroundColor: '#00e676', showLine: false }
+    ]
+  },
+  options: { ...baseOpts, scales: { x: makeScale('Preço P (R$)'), y: yRevScale } }
+});
+
+// ── SCENARIOS ─────────────────────────────────────────
+let scenarios = [];
+
+function saveScenario() {
+  const p1 = +$('iP1').value||0, q1 = +$('iQ1').value||0;
+  const ed = +$('iEd').value||0, p2 = +$('iSlider').value;
+  const q2 = Math.max(0, q1 * Math.pow(p2 / p1, ed));
+  const rt1 = p1*q1, rt2 = p2*q2, d = rt2-rt1;
+  if (scenarios.length >= 6) scenarios.shift();
+  scenarios.push({ p1, q1, ed, p2, rt2, d });
+  renderScenarios();
+}
+
+function renderScenarios() {
+  const c = $('scList');
+  if (!scenarios.length) {
+    c.innerHTML = '<div class="sc-empty">Nenhum cenário salvo ainda.</div>';
+    return;
+  }
+  c.innerHTML = [...scenarios].reverse().map((s, i) => {
+    const origIdx = scenarios.length - 1 - i;
+    return `<div class="sc-item" onclick="loadScenario(${origIdx})">
+      <div>
+        <div style="color:var(--accent);font-weight:600;font-size:.65rem">P₂: R$ ${s.p2.toFixed(0)}</div>
+        <div style="font-size:.55rem;color:var(--txt3);margin-top:2px">P₁=${s.p1} · Q₁=${s.q1} · Ed=${s.ed}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:.66rem;color:var(--txt2)">${fmtS(s.rt2)}</div>
+        <div style="font-size:.58rem;color:${s.d>=0?'var(--green)':'var(--red)'}">${pfx(s.d)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function loadScenario(i) {
+  const s = scenarios[i];
+  $('iP1').value = s.p1;
+  $('iQ1').value = s.q1;
+  $('iEd').value = s.ed;
+  onP1Change();
+  $('iSlider').value = s.p2;
+  calculate();
+}
+
+// ── PARAM CHANGE ──────────────────────────────────────
+function onP1Change() {
+  const p1  = +$('iP1').value || 100;
+  const sl  = $('iSlider');
+  const mn  = +(p1 * 0.35).toFixed(2);
+  const mx  = +(p1 * 1.65).toFixed(2);
+  sl.min = mn; sl.max = mx;
+  if (+sl.value < mn) sl.value = mn;
+  if (+sl.value > mx) sl.value = mx;
+  $('slMin').textContent = 'R$ ' + mn.toFixed(0);
+  $('slMax').textContent = 'R$ ' + mx.toFixed(0);
+  calculate();
+}
+
+// ── MAIN CALCULATE ────────────────────────────────────
+function calculate() {
+  const p1 = +$('iP1').value || 0;
+  const q1 = +$('iQ1').value || 0;
+  const ed = +$('iEd').value || 0;
+  const sl = $('iSlider');
+  const p2 = +sl.value || p1;
+
+  if (p1 <= 0 || q1 <= 0) return;
+
+  // slider fill
+  const pctFill = ((p2 - +sl.min) / (+sl.max - +sl.min)) * 100;
+  sl.style.setProperty('--pct', pctFill + '%');
+
+  // slider display
+  const dPabs = p2 - p1;
+  const dPpct = dPabs / p1;
+  $('slDisplay').textContent = 'R$ ' + p2.toFixed(2);
+  const sdEl = $('slDelta');
+  if (Math.abs(dPpct) < 0.0005) {
+    sdEl.textContent = '= sem alteração'; sdEl.style.color = 'var(--txt3)';
+  } else {
+    sdEl.textContent = (dPabs > 0 ? '+' : '') + 'R$ ' + dPabs.toFixed(2) + ' (' + (dPpct*100).toFixed(1) + '%)';
+    sdEl.style.color = dPabs > 0 ? 'var(--red)' : 'var(--green)';
+  }
+
+  // elasticity badge
+  const eAbs = Math.abs(ed);
+  const bdg = $('edBadge'), dot = $('edDot'), txt = $('edTxt');
+  let eC, eL;
+  if (eAbs > 1) {
+    eC='var(--accent)'; eL='Demanda Elástica  |Ed| > 1';
+    bdg.style.background='var(--acc-a)'; bdg.style.borderColor='var(--acc-b)';
+  } else if (eAbs === 1) {
+    eC='var(--txt)'; eL='Elasticidade Unitária  |Ed| = 1';
+    bdg.style.background='rgba(255,255,255,.04)'; bdg.style.borderColor='rgba(255,255,255,.12)';
+  } else if (eAbs > 0) {
+    eC='var(--amber)'; eL='Demanda Inelástica  |Ed| < 1';
+    bdg.style.background='var(--amb-a)'; bdg.style.borderColor='rgba(255,171,0,.25)';
+  } else {
+    eC='var(--red)'; eL='Perfeitamente Inelástica';
+    bdg.style.background='var(--red-a)'; bdg.style.borderColor='rgba(255,23,68,.2)';
+  }
+  dot.style.background = eC; dot.style.boxShadow = '0 0 6px ' + eC;
+  txt.style.color = eC; txt.textContent = eL;
+
+  // ── CORE MATH (constant elasticity model) ──
+  const stock  = +$('iStock').value;
+  const hasStk = stock > 0 && !isNaN(stock);
+  const cmvRaw = $('iCmv').value;
+  const c      = cmvRaw !== '' ? +cmvRaw : null;
+  const hasCmv = c !== null && c >= 0 && isFinite(c);
+
+  const q2     = Math.max(0, q1 * Math.pow(p2 / p1, ed));
+  const dQabs  = q2 - q1;
+  const dQpct  = q1 > 0 ? dQabs / q1 : 0;
+  const rt1    = p1 * q1;
+  const rt2    = p2 * q2;
+  const dRt    = rt2 - rt1;
+  const dRtPct = rt1 > 0 ? dRt / rt1 : 0;
+  const rmg    = ed !== 0 ? p2 * (1 + 1 / ed) : null;
+  const dCs    = -((q1 + q2) / 2) * dPabs;
+
+  // profit math
+  const lucro1   = hasCmv ? (p1 - c) * q1 : null;
+  const lucro2   = hasCmv ? (p2 - c) * q2 : null;
+  const dLucro   = hasCmv ? lucro2 - lucro1 : null;
+  const dLucroPct = (hasCmv && lucro1 !== 0) ? dLucro / Math.abs(lucro1) : null;
+  const margemPct = hasCmv && p2 > 0 ? (p2 - c) / p2 : null;
+  const cmvTotal  = hasCmv ? c * q2 : null;
+  // Lerner index: L = (P-c)/P = -1/Ed at optimum; display actual markup position
+  const lerner   = ed !== 0 ? -1 / ed : null;
+  // Profit-maximizing price (first order condition: d/dP[(P-c)*Q1*(P/P1)^Ed] = 0)
+  // → P*_lucro = c * Ed / (Ed + 1)   [valid when Ed < -1 and c > 0]
+  const pLucroOpt = (hasCmv && c > 0 && ed < -1) ? c * ed / (ed + 1) : null;
+  const lucroAtPopt = (pLucroOpt && pLucroOpt > 0) ? (pLucroOpt - c) * q1 * Math.pow(pLucroOpt / p1, ed) : null;
+
+  // ── CMV SIDEBAR BADGE ──
+  const cmvBadge = $('cmvBadge');
+  if (hasCmv) {
+    cmvBadge.style.display = '';
+    const mc = p2 - c;
+    const okColor = mc > 0 ? 'var(--green)' : 'var(--red)';
+    cmvBadge.innerHTML =
+      `MC unitária: <strong style="color:${okColor}">${fmtS(mc)}</strong> &nbsp;|&nbsp; ` +
+      `Margem: <strong style="color:${okColor}">${margemPct !== null ? (margemPct*100).toFixed(1)+'%' : '—'}</strong>` +
+      (pLucroOpt ? `<br>P* lucro: <strong style="color:var(--amber)">R$ ${pLucroOpt.toFixed(2)}</strong>` +
+        ` → π* = <strong style="color:var(--green)">${fmtS(lucroAtPopt)}</strong>` : '');
+  } else {
+    cmvBadge.style.display = 'none';
+  }
+
+  // ── STOCK CONSTRAINT MATH ──
+  let pStar = null, rtStar = null, stockGap = 0, rtReal = rt2;
+  const stockBreach = hasStk && q2 > stock;
+  if (hasStk) {
+    if (ed !== 0 && stock > 0 && q1 > 0) {
+      pStar  = p1 * Math.pow(stock / q1, 1 / ed);
+      rtStar = hasCmv ? (pStar - c) * stock : pStar * stock;
+    }
+    stockGap = Math.max(0, q2 - stock);
+    const qFulfilled = Math.min(q2, stock);
+    rtReal = hasCmv ? (p2 - c) * qFulfilled : p2 * qFulfilled;
+  }
+
+  // ── STOCK SIDEBAR WIDGETS ──
+  const kRowStock = $('kRowStock');
+  kRowStock.style.display = hasStk ? '' : 'none';
+
+  const stkQ2val = $('stkQ2val'), stkSval = $('stkSval');
+  const stkWarn = $('stkWarn'), stkOk = $('stkOk');
+  const stkBarFill = $('stkBarFill'), stkOptBlock = $('stkOptBlock');
+
+  if (hasStk) {
+    stkQ2val.textContent = Math.round(q2).toLocaleString('pt-BR') + ' un';
+    stkQ2val.style.color = stockBreach ? 'var(--red)' : 'var(--green)';
+    stkSval.textContent  = stock.toLocaleString('pt-BR') + ' un';
+
+    const fillPct = Math.min(100, (q2 / stock) * 100);
+    stkBarFill.style.width = fillPct + '%';
+    stkBarFill.style.background = fillPct <= 80 ? 'var(--green)' : fillPct <= 100 ? 'var(--amber)' : 'var(--red)';
+
+    stkWarn.style.display = stockBreach ? 'flex' : 'none';
+    stkOk.style.display   = stockBreach ? 'none'  : 'flex';
+
+    if (pStar !== null && pStar > 0 && isFinite(pStar)) {
+      const aboveBelow = pStar > p2 ? '<span style="color:var(--amber)">↑ acima</span>' : '<span style="color:var(--green)">↓ abaixo</span>';
+      const rtStarLabel = hasCmv ? 'π* = ' : 'RT* = ';
+      stkOptBlock.style.display = '';
+      stkOptBlock.innerHTML =
+        `P* estoque: <strong style="color:var(--amber)">R$ ${pStar.toFixed(2)}</strong> ` +
+        `(${aboveBelow} de P₂). ` +
+        rtStarLabel + `<strong style="color:${rtStar >= (hasCmv?lucro1:rt1) ? 'var(--green)' : 'var(--red)'}">` +
+        `${fmtS(rtStar)}</strong>.`;
+    } else {
+      stkOptBlock.style.display = 'none';
+    }
+
+    // ── STOCK KPI ROW ──
+    $('kStock').textContent = stock.toLocaleString('pt-BR') + ' un';
+
+    const gapEl = $('kGap');
+    if (stockGap > 0) {
+      gapEl.textContent = '−' + Math.round(stockGap).toLocaleString('pt-BR') + ' un';
+      gapEl.style.color = 'var(--red)';
+      $('kGapSub').textContent = 'Ruptura: ' + fmtS(p2 * stockGap) + ' em vendas perdidas';
+    } else {
+      gapEl.textContent = 'Sem ruptura';
+      gapEl.style.color = 'var(--green)';
+      $('kGapSub').textContent = 'Estoque suficiente para Q₂';
+    }
+
+    const rtRealEl = $('kRtReal');
+    const rtRealBase = hasCmv ? lucro1 : rt1;
+    rtRealEl.textContent = fmtS(rtReal);
+    rtRealEl.style.color = rtReal >= rtRealBase ? 'var(--green)' : 'var(--red)';
+    $('kRtRealSub').textContent = stockBreach ? (hasCmv ? 'Lucro limitado por estoque' : 'RT limitada por estoque') : (hasCmv ? 'Igual ao π₂ projetado' : 'Igual à RT₂ projetada');
+
+    const poptEl = $('kPopt');
+    if (pStar !== null && isFinite(pStar) && pStar > 0) {
+      poptEl.textContent = 'R$ ' + pStar.toFixed(2);
+      poptEl.style.color = 'var(--amber)';
+      $('kPoptSub').textContent = (hasCmv ? 'π* = ' : 'RT* = ') + fmtS(rtStar);
+    } else {
+      poptEl.textContent = '—'; poptEl.style.color = 'var(--txt3)';
+      $('kPoptSub').textContent = 'Ed = 0 ou S = Q₁';
+    }
+  }
+
+  // ── HEADER LIVE ──
+  const hRef1 = hasCmv ? lucro1 : rt1;
+  const hRef2 = hasCmv ? lucro2 : rt2;
+  const hDRef = hasCmv ? dLucro : dRt;
+  $('hRt1').textContent = fmtS(hRef1); $('hRt1').style.color = 'var(--txt2)';
+  $('hRt2').textContent = fmtS(hRef2); $('hRt2').style.color = clr(hDRef);
+  $('hDrt').textContent = pfx(hDRef);  $('hDrt').style.color = clr(hDRef);
+  const hMarginEl = $('hMargin');
+  if (hasCmv && margemPct !== null) {
+    hMarginEl.textContent = (margemPct * 100).toFixed(1) + '%';
+    hMarginEl.style.color = margemPct > 0 ? 'var(--green)' : 'var(--red)';
+  } else {
+    hMarginEl.textContent = '—'; hMarginEl.style.color = 'var(--txt3)';
+  }
+
+  // ── KPI ROW 1 — LUCRO ──
+  const L1El = $('kLucro1'), L2El = $('kLucro2'), DLEl = $('kDlucro'), MEl = $('kMargem');
+  if (hasCmv) {
+    L1El.textContent = fmtS(lucro1); L1El.style.color = lucro1 >= 0 ? 'var(--txt)' : 'var(--red)';
+    $('kLucro1Sub').textContent = `(${p1}−${c}) × ${q1}`;
+
+    L2El.textContent = fmtS(lucro2); L2El.style.color = clr(dLucro);
+    $('kLucro2Sub').textContent = `(${p2.toFixed(1)}−${c}) × ${Math.round(q2).toLocaleString('pt-BR')}`;
+
+    DLEl.textContent = pfx(dLucro); DLEl.style.color = clr(dLucro);
+    $('kDlucroPct').textContent = dLucroPct !== null ? pctStr(dLucroPct, 2) + ' vs π₁' : '—';
+
+    MEl.textContent = (margemPct * 100).toFixed(1) + '%';
+    MEl.style.color = margemPct > 0 ? (margemPct > 0.3 ? 'var(--green)' : 'var(--amber)') : 'var(--red)';
+    $('kMargemSub').textContent = `(${p2.toFixed(1)}−${c}) ÷ ${p2.toFixed(1)}`;
+  } else {
+    // fallback: show RT data when no CMV
+    L1El.textContent = fmtS(rt1); L1El.style.color = 'var(--txt)';
+    $('kLucro1Sub').textContent = 'RT₁ = P₁ × Q₁  (sem CMV)';
+    L2El.textContent = fmtS(rt2); L2El.style.color = clr(dRt);
+    $('kLucro2Sub').textContent = 'RT₂ = P₂ × Q₂  (sem CMV)';
+    DLEl.textContent = pfx(dRt); DLEl.style.color = clr(dRt);
+    $('kDlucroPct').textContent = pctStr(dRtPct, 2) + ' vs RT₁';
+    MEl.textContent = '—'; MEl.style.color = 'var(--txt3)';
+    $('kMargemSub').textContent = 'Informe o CMV para calcular';
+  }
+
+  // ── KPI ROW 2 — RT + CUSTO ──
+  $('kRt2').textContent = fmtS(rt2); $('kRt2').style.color = 'var(--txt2)';
+  $('kRt2Sub').textContent = `P₂(${p2.toFixed(1)}) × Q₂(${Math.round(q2).toLocaleString('pt-BR')})`;
+
+  const cmvTotalEl = $('kCmvTotal');
+  if (hasCmv) {
+    cmvTotalEl.textContent = fmtS(-cmvTotal); cmvTotalEl.style.color = 'var(--red)';
+    $('kCmvTotalSub').textContent = `R$ ${c} × ${Math.round(q2).toLocaleString('pt-BR')} un`;
+  } else {
+    cmvTotalEl.textContent = '—'; cmvTotalEl.style.color = 'var(--txt3)';
+    $('kCmvTotalSub').textContent = 'Informe o CMV';
+  }
+
+  const q2El = $('kQ2');
+  q2El.textContent       = Math.round(q2).toLocaleString('pt-BR') + ' un';
+  q2El.style.color       = clr(dQabs);
+  $('kQ2Sub').textContent = (dQabs >= 0 ? '+' : '') + Math.round(dQabs).toLocaleString('pt-BR') + ' un vs Q₁';
+
+  const lernerEl = $('kLerner');
+  if (lerner !== null) {
+    lernerEl.textContent = lerner.toFixed(3);
+    lernerEl.style.color = lerner > 0 ? 'var(--accent)' : 'var(--red)';
+  } else {
+    lernerEl.textContent = '—'; lernerEl.style.color = 'var(--txt3)';
+  }
+
+  // ── KPI ROW 3 ──
+  const dpEl = $('kDp');
+  dpEl.textContent = pctStr(dPpct, 2); dpEl.style.color = clr(dPpct);
+  $('kDpAbs').textContent = (dPabs >= 0 ? '+' : '') + 'R$ ' + dPabs.toFixed(2);
+
+  const dqEl = $('kDq');
+  dqEl.textContent = pctStr(dQpct, 2); dqEl.style.color = clr(dQpct);
+  $('kDqAbs').textContent = (dQabs >= 0 ? '+' : '') + Math.round(dQabs).toLocaleString('pt-BR') + ' un';
+
+  const rmgEl = $('kRmg');
+  if (rmg !== null) {
+    rmgEl.textContent = fmtS(rmg); rmgEl.style.color = rmg >= 0 ? 'var(--green)' : 'var(--red)';
+  } else { rmgEl.textContent = '∞'; rmgEl.style.color = 'var(--txt3)'; }
+
+  const csEl = $('kCs');
+  csEl.textContent = pfx(dCs); csEl.style.color = clr(dCs);
+
+  // ── REV CHART TAG ──
+  const rTag = $('revTag');
+  const focusDelta = hasCmv ? dLucro : dRt;
+  if (Math.abs(focusDelta) < 0.5) {
+    rTag.textContent = '= neutro';    rTag.style.color = 'var(--txt3)';  rTag.style.borderColor = 'var(--bdr2)';
+  } else if (focusDelta > 0) {
+    rTag.textContent = '↑ lucro +';  rTag.style.color = 'var(--green)'; rTag.style.borderColor = 'rgba(0,230,118,.3)';
+  } else {
+    rTag.textContent = '↓ lucro −';  rTag.style.color = 'var(--red)';   rTag.style.borderColor = 'rgba(255,23,68,.3)';
+  }
+  // Update chart 2 label depending on CMV
+  $('chart2Title').textContent = hasCmv ? 'Curva de Lucro' : 'Curva de Receita Total';
+  $('chart2Sub').textContent   = hasCmv ? 'π = (P − c) × Q — Maximização de Lucro' : 'RT = f(P) — sem CMV definido';
+
+  // ── OPTIMAL NOTE ──
+  const oEl = $('optText');
+  const eAbs2 = Math.abs(ed);
+  if (hasCmv && pLucroOpt && pLucroOpt > 0) {
+    const poptDir = pLucroOpt > p2 ? '<span style="color:var(--amber)">↑ acima</span>' : '<span style="color:var(--green)">↓ abaixo</span>';
+    oEl.innerHTML =
+      `P* que maximiza <strong>lucro</strong>: <strong style="color:var(--amber)">R$ ${pLucroOpt.toFixed(2)}</strong> ` +
+      `(${poptDir} de P₂ = R$ ${p2.toFixed(2)}). ` +
+      `π* = <strong style="color:var(--green)">${fmtS(lucroAtPopt)}</strong>.`;
+  } else if (!hasCmv) {
+    if (eAbs2 === 1)
+      oEl.innerHTML = 'O preço atual <strong class="ac">já maximiza RT</strong>. Informe o CMV para análise de lucro.';
+    else if (eAbs2 > 1)
+      oEl.innerHTML = 'Demanda <span class="ac">elástica</span>: reduzir P aumenta RT. Informe CMV para P* de lucro.';
+    else if (eAbs2 > 0)
+      oEl.innerHTML = 'Demanda <span class="am">inelástica</span>: aumentar P eleva RT. Informe CMV para P* de lucro.';
+    else
+      oEl.innerHTML = 'Perfeitamente inelástica. Qualquer alta de P é ganho puro de RT.';
+  } else {
+    oEl.innerHTML = 'P* de lucro requer Ed < −1. Com demanda inelástica, o lucro é maximizado aumentando P indefinidamente (até restrição de mercado).';
+  }
+
+  // ── UPDATE CHARTS ──
+  updateCharts(p1, q1, ed, p2, q2, rt1, rt2, hasCmv ? dLucro : dRt, hasStk ? stock : null, pStar, hasCmv ? c : null, pLucroOpt);
+
+  // ── INTERPRETATION ──
+  updateInterp(p1, q1, ed, p2, q2, rt1, rt2, dPpct, dQpct, dRt, dRtPct, rmg, hasStk, stock, stockBreach, stockGap, pStar, rtStar, rtReal, hasCmv, c, lucro1, lucro2, dLucro, dLucroPct, margemPct, pLucroOpt, lucroAtPopt);
+}
+
+// ── UPDATE CHARTS ─────────────────────────────────────
+function updateCharts(p1, q1, ed, p2, q2, rt1, rt2, focusDelta, stock, pStar, c, pLucroOpt) {
+  const hasCmv = c !== null && c !== undefined;
+  const N = 70, pMin = p1 * 0.2, pMax = p1 * 1.8, step = (pMax - pMin) / N;
+  const dData = [], rData = [];
+  for (let i = 0; i <= N; i++) {
+    const p = pMin + i * step;
+    const q = q1 * Math.pow(p / p1, ed);
+    if (q >= 0 && isFinite(q)) {
+      const yVal = hasCmv ? (p - c) * q : p * q;
+      dData.push({ x: +p.toFixed(3), y: +q.toFixed(3) });
+      if (isFinite(yVal)) rData.push({ x: +p.toFixed(3), y: +yVal.toFixed(3) });
+    }
+  }
+
+  const ptCol   = focusDelta >= 0 ? '#00e676' : '#ff1744';
+  const lineCol = focusDelta >= 0 ? 'rgba(0,230,118,.55)'  : 'rgba(255,23,68,.55)';
+  const fillCol = focusDelta >= 0 ? 'rgba(0,230,118,.04)'  : 'rgba(255,23,68,.04)';
+
+  if (!dChart.data.datasets[3]) {
+    dChart.data.datasets.push({
+      label:'Estoque (S)', data:[], borderColor:'rgba(255,171,0,.5)', borderWidth:1.5,
+      borderDash:[5,4], pointRadius:0, fill:false, showLine:true, tension:0
+    });
+    dChart.data.datasets.push({
+      label:'P* (c/ estoque)', data:[], borderWidth:0, pointRadius:8, pointHoverRadius:10,
+      backgroundColor:'#ffab00', showLine:false, pointStyle:'triangle'
+    });
+  }
+
+  dChart.data.datasets[0].data = dData;
+  dChart.data.datasets[1].data = [{ x: +p1.toFixed(3), y: +q1.toFixed(3) }];
+  dChart.data.datasets[2].data = [{ x: +p2.toFixed(3), y: +q2.toFixed(3) }];
+  dChart.data.datasets[2].backgroundColor = ptCol;
+
+  if (stock && stock > 0) {
+    dChart.data.datasets[3].data = [
+      { x: +(pMin).toFixed(3), y: +stock.toFixed(3) },
+      { x: +(pMax).toFixed(3), y: +stock.toFixed(3) }
+    ];
+    if (pStar && pStar > 0 && isFinite(pStar)) {
+      const qAtPstar = q1 * Math.pow(pStar / p1, ed);
+      dChart.data.datasets[4].data = [{ x: +pStar.toFixed(3), y: +qAtPstar.toFixed(3) }];
+    } else { dChart.data.datasets[4].data = []; }
+  } else {
+    dChart.data.datasets[3].data = [];
+    dChart.data.datasets[4].data = [];
+  }
+  dChart.update('none');
+
+  // y-values at P1 and P2 for the focus curve
+  const y1 = hasCmv ? (p1 - c) * q1 : rt1;
+  const y2 = hasCmv ? (p2 - c) * q2 : rt2;
+
+  rChart.data.datasets[0].data            = rData;
+  rChart.data.datasets[0].borderColor     = lineCol;
+  rChart.data.datasets[0].backgroundColor = fillCol;
+  rChart.data.datasets[1].data = [{ x: +p1.toFixed(3), y: +y1.toFixed(3) }];
+  rChart.data.datasets[2].data = [{ x: +p2.toFixed(3), y: +y2.toFixed(3) }];
+  rChart.data.datasets[2].backgroundColor = ptCol;
+
+  // P*_lucro marker (gold triangle on profit chart)
+  if (!rChart.data.datasets[3]) {
+    rChart.data.datasets.push({
+      label:'P* lucro', data:[], borderWidth:0, pointRadius:9, pointHoverRadius:11,
+      backgroundColor:'#ffab00', showLine:false, pointStyle:'triangle'
+    });
+  }
+  if (hasCmv && pLucroOpt && pLucroOpt > 0 && isFinite(pLucroOpt)) {
+    const qOpt = q1 * Math.pow(pLucroOpt / p1, ed);
+    const yOpt = (pLucroOpt - c) * qOpt;
+    if (isFinite(yOpt)) rChart.data.datasets[3].data = [{ x: +pLucroOpt.toFixed(3), y: +yOpt.toFixed(3) }];
+    else rChart.data.datasets[3].data = [];
+  } else if (!hasCmv && pStar && pStar > 0 && isFinite(pStar)) {
+    const rtAtPstar = pStar * stock;
+    rChart.data.datasets[3].data = [{ x: +pStar.toFixed(3), y: +rtAtPstar.toFixed(3) }];
+  } else {
+    rChart.data.datasets[3].data = [];
+  }
+  rChart.update('none');
+}
+
+// ── INTERPRETATION ────────────────────────────────────
+function updateInterp(p1, q1, ed, p2, q2, rt1, rt2, dPpct, dQpct, dRt, dRtPct, rmg,
+    hasStk, stock, stockBreach, stockGap, pStar, rtStar, rtReal,
+    hasCmv, c, lucro1, lucro2, dLucro, dLucroPct, margemPct, pLucroOpt, lucroAtPopt) {
+  const eAbs    = Math.abs(ed);
+  const elastic   = eAbs > 1;
+  const inelastic = eAbs < 1 && eAbs > 0;
+  const up   = p2 > p1 + 0.01;
+  const down = p2 < p1 - 0.01;
+  const pEl  = $('interpTxt'), sEl = $('stratTxt');
+
+  if (!up && !down) {
+    pEl.innerHTML = '<strong>Preço inalterado.</strong> Mova o slider P₂ para iniciar a simulação de cenários.';
+    sEl.innerHTML = 'Ajuste P₂ para receber uma recomendação estratégica baseada nos parâmetros.';
+    return;
+  }
+
+  const dir    = up ? 'alta' : 'redução';
+  const dppStr = (Math.abs(dPpct)*100).toFixed(1) + '%';
+  const dqpStr = (Math.abs(dQpct)*100).toFixed(1) + '%';
+  const eLabel = elastic ? '<span class="ac">elástica</span>' : inelastic ? '<span class="am">inelástica</span>' : '<span>unitária</span>';
+
+  let propLabel;
+  if (elastic)   propLabel = up ? '<span class="r">cai mais que proporcionalmente</span>' : '<span class="g">cresce mais que proporcionalmente</span>';
+  else if (inelastic) propLabel = up ? '<span class="am">cai menos que proporcionalmente</span>' : '<span class="am">cresce menos que proporcionalmente</span>';
+  else            propLabel = '<strong>mantém-se proporcional</strong>';
+
+  // Profit interpretation line
+  let profitLine = '';
+  if (hasCmv) {
+    const mc2 = p2 - c;
+    const mc2Str = `<strong style="color:${mc2>0?'var(--green)':'var(--red)'}">R$ ${mc2.toFixed(2)}</strong>`;
+    const mPctStr = `<strong style="color:${margemPct>0?'var(--green)':'var(--red)'}">${(margemPct*100).toFixed(1)}%</strong>`;
+    const dLStr = `<strong style="color:${clr(dLucro)}">${pfx(dLucro)}</strong>`;
+    const dLPStr = dLucroPct !== null ? ` (<strong style="color:${clr(dLucro)}">${pctStr(dLucroPct,2)}</strong>)` : '';
+    profitLine = ` MC unitária em P₂: ${mc2Str} (margem ${mPctStr}). Impacto no <strong>lucro</strong>: ${dLStr}${dLPStr}.`;
+    if (mc2 < 0) profitLine += ` <span class="r">⚠ Venda abaixo do custo!</span>`;
+  }
+
+  const rmgNote = rmg !== null
+    ? ' RMg = <strong style="color:' + clr(rmg) + '">' + fmtS(rmg) + '</strong>.'
+    : '';
+
+  pEl.innerHTML =
+    `Com demanda ${eLabel} (Ed = <strong>${ed}</strong>), a ${dir} de <strong>${dppStr}</strong> em P leva ` +
+    `a quantidade a ${propLabel} em <strong>${dqpStr}</strong>. ` +
+    `Impacto na RT: <strong style="color:${clr(dRt)}">${pfx(dRt)}</strong>.` +
+    profitLine + rmgNote;
+
+  let strat = '';
+  if (hasCmv) {
+    // Profit-first strategy
+    const mc2 = p2 - c;
+    if (mc2 <= 0) {
+      strat = `<span class="r">🚨 Preço abaixo do CMV:</span> cada venda <strong>destrói caixa</strong>. ` +
+              `Preço mínimo de viabilidade: R$ ${(c * 1.01).toFixed(2)} (break-even + 1%).`;
+    } else if (elastic && up) {
+      strat = `<span class="r">⚠ Alerta:</span> demanda elástica + alta de preço = <strong>perda de lucro por volume</strong>. ` +
+              `A margem por unidade sobe mas Q cai desproporcionalmente.`;
+    } else if (elastic && down) {
+      strat = `<span class="g">✓ Oportunidade de volume:</span> margem por unidade reduz, mas o ganho em quantidade ` +
+              `<strong>pode compensar</strong> dependendo da margem atual.`;
+    } else if (inelastic && up) {
+      strat = `<span class="g">✓ Alta de preço com demanda inelástica:</span> a MC unitária sobe e Q cai pouco — ` +
+              `combinação <strong>favorável ao lucro</strong>.`;
+    } else if (inelastic && down) {
+      strat = `<span class="r">⚠ Cautela:</span> reduzir preço com demanda inelástica comprime margem sem ganho ` +
+              `relevante de volume. <strong>Lucro deteriora</strong>.`;
+    } else {
+      strat = `Elasticidade unitária: RT neutra, mas a margem por unidade muda. Acompanhe o lucro absoluto.`;
+    }
+    if (pLucroOpt && pLucroOpt > 0 && isFinite(pLucroOpt)) {
+      const dist = Math.abs(p2 - pLucroOpt);
+      const poptDir = pLucroOpt > p2 ? `↑ suba para R$ ${pLucroOpt.toFixed(2)}` : `↓ reduza para R$ ${pLucroOpt.toFixed(2)}`;
+      strat += `<br><br><span class="am">📌 P* de lucro = R$ ${pLucroOpt.toFixed(2)}</span> ` +
+               `(distância: R$ ${dist.toFixed(2)}). ${poptDir} para maximizar lucro → π* = ` +
+               `<strong style="color:var(--green)">${fmtS(lucroAtPopt)}</strong>.`;
+    }
+  } else {
+    // Revenue-only mode
+    if (elastic && up)
+      strat = `<span class="r">⚠ Alerta:</span> demanda elástica + aumento de preço = <strong>destruição de receita</strong>. ` +
+              `Informe o CMV para análise de lucro.`;
+    else if (elastic && down)
+      strat = `<span class="g">✓ Oportunidade:</span> demanda elástica + redução de preço = <strong>receita amplificada via volume</strong>. ` +
+              `Informe o CMV para saber se o lucro acompanha.`;
+    else if (inelastic && up)
+      strat = `<span class="g">✓ Favorável:</span> demanda inelástica permite repasse de preço com ganho de RT. ` +
+              `Informe o CMV para confirmar impacto no lucro.`;
+    else if (inelastic && down)
+      strat = `<span class="r">⚠ Cautela:</span> reduzir preço com demanda inelástica sacrifica receita sem compensação de volume.`;
+    else
+      strat = `Elasticidade unitária: variações de P são neutras para RT. Informe o CMV para ver impacto no lucro.`;
+  }
+
+  if (rmg !== null && rmg < 0)
+    strat += `<br><br><span class="r">⚠ RMg < 0:</span> a última unidade em P₂ <strong>destrói receita marginal</strong>.`;
+
+  // Stock addendum
+  if (hasStk && pStar !== null && isFinite(pStar) && pStar > 0) {
+    const pstarFmt = 'R$ ' + pStar.toFixed(2);
+    const rtStarFmt = fmtS(rtStar);
+    const rtLabel   = hasCmv ? 'lucro' : 'receita';
+    if (stockBreach) {
+      strat += `<br><br><span class="r">🗄 Ruptura de Estoque:</span> demanda (${Math.round(q2).toLocaleString('pt-BR')} un) ` +
+               `excede estoque em <strong>${Math.round(stockGap).toLocaleString('pt-BR')} un</strong>. ` +
+               `${hasCmv ? 'Lucro' : 'RT'} realizável: <strong style="color:${clr(rtReal-(hasCmv?lucro1:rt1))}">${fmtS(rtReal)}</strong>. ` +
+               `P* (sem ruptura): <strong style="color:var(--amber)">${pstarFmt}</strong> → ${rtLabel}* = <strong>${rtStarFmt}</strong>.`;
+    } else if (down) {
+      strat += `<br><br><span class="am">🗄 Aviso de Estoque:</span> P* de equilíbrio de estoque = ` +
+               `<strong style="color:var(--amber)">${pstarFmt}</strong>. Abaixo disso ocorre ruptura.`;
+    }
+  }
+
+  sEl.innerHTML = strat;
+}
+
+// ── INIT ─────────────────────────────────────────────
+onP1Change();
+</script>
+</body>
+</html>
